@@ -1,0 +1,11 @@
+# 原始素材文件夹（仅本地保留，不提交）
+/无人机的智能楼宇自动取件系统/
+
+# 系统文件
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# 编辑器
+.vscode/
+.idea/
