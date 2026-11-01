@@ -21,6 +21,57 @@ const SITE_DATA = {
       { type: "GitHub", url: "https://github.com/Chilingyue" },
       { type: "Email", url: "mailto:1093474052@qq.com" },
     ],
+
+    /* ---- 教育背景 ---- */
+    education: [
+      {
+        school: { zh: "南京邮电大学", en: "Nanjing University of Posts and Telecommunications" },
+        degree: {
+          zh: "计算机技术 · 硕士在读（保研）",
+          en: "M.Sc. in Computer Technology (recommended admission)",
+        },
+        period: "2025.09 – 至今",
+        note: { zh: "专业前 10%", en: "Top 10%" },
+      },
+      {
+        school: {
+          zh: "南京邮电大学（双一流）",
+          en: "Nanjing University of Posts and Telecommunications (Double First-Class)",
+        },
+        degree: {
+          zh: "计算机科学与技术 · 学士",
+          en: "B.Sc. in Computer Science and Technology",
+        },
+        period: "2021.09 – 2025.06",
+        note: { zh: "专业前 10%", en: "Top 10%" },
+      },
+    ],
+
+    /* ---- 技术栈（分组）---- */
+    skills: [
+      {
+        label: { zh: "编程与工具", en: "Programming & Tools" },
+        items: ["Python", "C/C++", "PyTorch", "SQL", "NumPy", "Pandas"],
+      },
+      {
+        label: { zh: "算法与建模", en: "Algorithms & Modeling" },
+        items: ["A*", "Dijkstra", "ACO", "DQN", "PPO"],
+      },
+      {
+        label: { zh: "系统与工程", en: "Systems & Engineering" },
+        items: ["Linux", "ROS 2", "Git", "性能测试"],
+      },
+    ],
+
+    /* ---- 获奖与荣誉 ---- */
+    awards: [
+      { category: { zh: "竞赛", en: "Contest" }, title: { zh: "蓝桥杯 C++ 江苏省二等奖", en: "Blue Bridge Cup C++ — 2nd Prize, Jiangsu" } },
+      { category: { zh: "竞赛", en: "Contest" }, title: { zh: "学院「挑战杯」二等奖", en: "School Challenge Cup — 2nd Prize" } },
+      { category: { zh: "学业", en: "Academic" }, title: { zh: "国家励志奖学金", en: "National Encouragement Scholarship" } },
+      { category: { zh: "学业", en: "Academic" }, title: { zh: "校级一等奖学金", en: "University First-Class Scholarship" } },
+      { category: { zh: "学业", en: "Academic" }, title: { zh: "优秀研究生", en: "Outstanding Graduate Student" } },
+      { category: { zh: "学业", en: "Academic" }, title: { zh: "校级三好学生", en: "University Merit Student" } },
+    ],
   },
 
   projects: [

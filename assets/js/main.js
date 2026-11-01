@@ -144,7 +144,83 @@ function renderHome() {
   box.append(head, grid);
   section.appendChild(box);
 
-  root.append(hero, section, buildFooter());
+  root.append(hero, buildAboutSection(), section, buildFooter());
+}
+
+/* ---------- 首页：关于我（教育 / 技术栈 / 荣誉）---------- */
+function buildAboutSection() {
+  const zh = state.lang === "zh";
+  const owner = SITE_DATA.owner;
+  const section = h("section", "section");
+  const box = h("div", "container");
+
+  const head = h("div", "section-head");
+  head.append(
+    h("h2", "", zh ? "关于我" : "About"),
+    h("p", "", zh ? "教育背景、技术栈与荣誉" : "Education, skills and honors")
+  );
+  box.appendChild(head);
+
+  /* 教育 */
+  if (owner.education && owner.education.length) {
+    const block = h("div", "about-block");
+    block.appendChild(h("h3", "about-title", zh ? "教育" : "Education"));
+    const list = h("div", "edu-list");
+    owner.education.forEach((e) => {
+      const item = h("div", "edu-item");
+      const main = h("div", "edu-main");
+      main.append(
+        h("div", "edu-school", t(e.school)),
+        h("div", "edu-degree", t(e.degree))
+      );
+      const side = h("div", "edu-side");
+      side.append(
+        h("span", "edu-period", e.period),
+        h("span", "edu-note", t(e.note))
+      );
+      item.append(main, side);
+      list.appendChild(item);
+    });
+    block.appendChild(list);
+    box.appendChild(block);
+  }
+
+  /* 技术栈 */
+  if (owner.skills && owner.skills.length) {
+    const block = h("div", "about-block");
+    block.appendChild(h("h3", "about-title", zh ? "技术栈" : "Skills"));
+    const groups = h("div", "skill-groups");
+    owner.skills.forEach((g) => {
+      const group = h("div", "skill-group");
+      group.appendChild(h("div", "skill-label", t(g.label)));
+      const tags = h("div", "tags");
+      g.items.forEach((i) => tags.appendChild(h("span", "tag", i)));
+      group.appendChild(tags);
+      groups.appendChild(group);
+    });
+    block.appendChild(groups);
+    box.appendChild(block);
+  }
+
+  /* 荣誉 */
+  if (owner.awards && owner.awards.length) {
+    const block = h("div", "about-block");
+    block.appendChild(h("h3", "about-title", zh ? "荣誉" : "Honors"));
+    const chips = h("div", "award-chips");
+    owner.awards.forEach((a) => {
+      const chip = h("span", "award-chip");
+      chip.append(
+        h("span", "award-cat", t(a.category)),
+        h("span", "award-title", t(a.title))
+      );
+      chips.appendChild(chip);
+    });
+    block.appendChild(chips);
+    box.appendChild(block);
+  }
+
+  section.appendChild(box);
+  return section;
 }
 
 function projectCard(p) {
