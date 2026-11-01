@@ -6,20 +6,20 @@
  * ============================================================ */
 
 const SITE_DATA = {
-  /* ---- 个人信息（标注 TODO 的内容请替换为真实信息）---- */
+  /* ---- 个人信息 ---- */
   owner: {
     name: { zh: "池凌越", en: "Chilingyue" },
     role: {
-      zh: "TODO：你的身份，例如「计算机科学与技术专业 · 本科生」",
-      en: "TODO: Your role, e.g. Undergraduate in Computer Science",
+      zh: "南京邮电大学 · 计算机技术专业硕士在读",
+      en: "M.Sc. candidate in Computer Technology, Nanjing University of Posts and Telecommunications",
     },
     bio: {
-      zh: "TODO：用 2-3 句话介绍你的研究方向、技术兴趣与擅长领域，例如关注机器人、无人机集群与嵌入式系统。",
-      en: "TODO: Write 2-3 sentences about your research interests, e.g. robotics, drone swarms and embedded systems.",
+      zh: "研究方向为无人机路径规划与边缘调度。关注动态环境下的三维路径规划、多无人机协同数据采集与轨迹优化，以及面向无人机通信的深度强化学习轨迹与无线服务联合规划；近期工作涉及海洋环境无人平台的动态风险评估与多目标路径规划。",
+      en: "My research focuses on UAV path planning and edge scheduling: 3D path planning in dynamic environments, cooperative multi-UAV data collection and trajectory optimization, and deep reinforcement learning for joint UAV trajectory and wireless service planning. Recent work covers dynamic risk assessment and multi-objective path planning for unmanned platforms in ocean environments.",
     },
     contacts: [
       { type: "GitHub", url: "https://github.com/Chilingyue" },
-      { type: "Email", url: "TODO: mailto:your_email@example.com" },
+      { type: "Email", url: "mailto:1093474052@qq.com" },
     ],
   },
 

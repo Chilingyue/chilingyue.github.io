@@ -2,7 +2,7 @@
 
 # Chilingyue · Portfolio
 
-**无人机、机器人与工程实践的个人作品集**
+**南京邮电大学计算机技术硕士在读 · 研究方向：无人机路径规划、边缘调度**
 纯静态站点 · 中英双语 · 深浅色主题 · 数据驱动渲染
 
 [在线访问](https://chilingyue.github.io/) · [GitHub](https://github.com/Chilingyue)
@@ -13,6 +13,14 @@
 ![主题](https://img.shields.io/badge/主题-浅色%20%2F%20深色-0d9488?style=flat-square)
 
 </div>
+
+---
+
+## 关于
+
+南京邮电大学计算机技术专业硕士在读（保研），本科就读于南京邮电大学计算机科学与技术专业（双一流）。研究方向为**无人机路径规划与边缘调度**：动态环境下的三维路径规划、多无人机协同数据采集与轨迹优化，以及深度强化学习驱动的无人机轨迹与无线服务联合规划。
+
+工具链：Python / C++、PyTorch、ROS 2、Linux；熟悉 A\*、Dijkstra、ACO 等优化算法，以及 DQN、PPO 等方法在轨迹优化中的工程落地。
 
 ---
 
@@ -95,14 +103,15 @@ npx serve .
 
 ---
 
-## 待补充
+## 联系
 
-`data/projects.js` 中 `owner` 部分的 `role`、`bio` 与邮箱仍是 TODO 占位，替换为真实信息后首页头部才会显示完整自我介绍。
+- GitHub：[Chilingyue](https://github.com/Chilingyue)
+- 邮箱：1093474052@qq.com
 
 ---
 
 <div align="center">
 
-© 2026 Chilingyue · 「无人机、机器人与工程实践成果」
+© 2026 池凌越 · Chilingyue
 
 </div>
