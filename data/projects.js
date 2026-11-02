@@ -218,7 +218,7 @@ const SITE_DATA = {
 
       /* ---- 创新点 ---- */
       innovations: [
-        { zh: "智能窗系统：与无人机交互自动完成快递投送，用户仅需发送请求指令", en: "Smart window: interacts with the drone to deliver parcels automatically; users only send a request" },
+        { zh: "智能窗系统：用户投件即发起任务，无人机与窗口交互自动完成取件交接", en: "Smart window: a drop-off starts the task, and the drone interacts with the window to complete the pickup automatically" },
         { zh: "飞行路线规划：以最短路径最快到达，飞行时避开窗户减少干扰", en: "Route planning: reaches the target via the shortest path while avoiding windows" },
         { zh: "自动避障系统：识别并躲避障碍物，保障货物与飞行安全", en: "Autonomous obstacle avoidance: detects and avoids obstacles for safe flight" },
         { zh: "无人机交互：快速接收并执行指令", en: "Drone interaction: receives and executes commands quickly" },
