@@ -264,6 +264,7 @@ const LABELS = {
   metrics: { zh: "关键指标", en: "Key Metrics" },
   background: { zh: "项目背景", en: "Background" },
   contributions: { zh: "我的工作与贡献", en: "My Contributions" },
+  journey: { zh: "探索历程", en: "Journey" },
   goals: { zh: "项目目标", en: "Goals" },
   workflow: { zh: "工作流程", en: "Workflow" },
   innovations: { zh: "特色与创新点", en: "Innovations" },
@@ -271,7 +272,7 @@ const LABELS = {
   videos: { zh: "视频演示", en: "Videos" },
   docs: { zh: "过程文档", en: "Process Documents" },
   issues: { zh: "问题与解决", en: "Issues & Solutions" },
-  references: { zh: "参考资料", en: "References" },
+  reflections: { zh: "项目感想", en: "Reflections" },
 };
 
 function sectionWrap(labelKey, contentNode) {
@@ -307,11 +308,6 @@ function renderDetail(projectId) {
     root.appendChild(sectionWrap("metrics", row));
   }
 
-  /* 背景 */
-  root.appendChild(
-    sectionWrap("background", h("div", "prose", `<p>${t(p.background)}</p>`))
-  );
-
   /* 贡献 */
   if (p.contributions) {
     const list = h("div", "contrib-list");
@@ -319,28 +315,101 @@ function renderDetail(projectId) {
     root.appendChild(sectionWrap("contributions", list));
   }
 
+  /* 背景：分段卡片（需求侧 / 现有不足 / 项目切入），兼容纯文本旧写法 */
+  if (Array.isArray(p.background)) {
+    const bgGrid = h("div", "bg-grid");
+    p.background.forEach((b) => {
+      const card = h("div", "bg-card");
+      card.appendChild(h("div", "bg-label", t(b.label)));
+      const ul = h("ul", "bg-points");
+      (b.points || []).forEach((pt) => ul.appendChild(h("li", "", t(pt))));
+      if (b.text) ul.appendChild(h("li", "", t(b.text)));
+      card.appendChild(ul);
+      bgGrid.appendChild(card);
+    });
+    root.appendChild(sectionWrap("background", bgGrid));
+  } else {
+    root.appendChild(
+      sectionWrap("background", h("div", "prose", `<p>${t(p.background)}</p>`))
+    );
+  }
+
   /* 目标 */
   const goalList = h("ul", "list-card");
   p.goals.forEach((g) => goalList.appendChild(h("li", "", t(g))));
   root.appendChild(sectionWrap("goals", goalList));
 
-  /* 工作流程 */
-  const flow = h("div", "flow-grid");
-  p.workflow.forEach((w) => {
-    const item = h("div", "flow-item");
-    item.append(
-      h("div", "num", w.step),
-      h("h4", "", t(w.title)),
-      h("p", "", t(w.desc))
-    );
-    flow.appendChild(item);
-  });
-  root.appendChild(sectionWrap("workflow", flow));
-
   /* 创新点 */
   const innoList = h("ul", "list-card");
   p.innovations.forEach((i) => innoList.appendChild(h("li", "", t(i))));
   root.appendChild(sectionWrap("innovations", innoList));
+
+  /* 工作流程：大波浪时间线，奇数步在波峰上方、偶数步在波谷下方 */
+  const flow = h("div", "flow-wrap");
+  const wave = h("div", "flow-wave");
+  wave.innerHTML =
+    '<svg viewBox="0 0 1000 96" preserveAspectRatio="none" aria-hidden="true">' +
+    '<path d="M0,48 Q100,-6 200,48 Q300,102 400,48 Q500,-6 600,48 Q700,102 800,48 Q900,-6 1000,48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-opacity="0.5" vector-effect="non-scaling-stroke"/>' +
+    "</svg>";
+  const grid = h("div", "flow-grid");
+  p.workflow.forEach((w, i) => {
+    const item = h("div", "flow-item " + (i % 2 === 0 ? "up" : "down"));
+    const body = h("div", "flow-body");
+    body.append(h("h4", "", t(w.title)), h("p", "", t(w.desc)));
+    item.append(body, h("div", "num", w.step));
+    grid.appendChild(item);
+  });
+  flow.append(wave, grid);
+  root.appendChild(sectionWrap("workflow", flow));
+
+  /* 探索历程 */
+  if (p.journey && p.journey.length) {
+    const list = h("div", "journey-list");
+    p.journey.forEach((j) => {
+      const item = h("div", "journey-item");
+      item.appendChild(h("span", "journey-phase", t(j.phase)));
+      const points = h("ul", "journey-points");
+      j.items.forEach((it) => points.appendChild(h("li", "", t(it))));
+      item.appendChild(points);
+      list.appendChild(item);
+    });
+    root.appendChild(sectionWrap("journey", list));
+  }
+
+  /* 问题与解决 */
+  const issueList = h("div", "issue-list");
+  p.issues.forEach((is) => {
+    const card = h("div", "issue-card");
+    const iw = h("div", "issue-img-wrap");
+    const img = h("img");
+    img.src = imgPath(p, is.img);
+    img.alt = t(is.title);
+    img.loading = "lazy";
+    img.addEventListener("click", () =>
+      openLightbox([{ src: imgPath(p, is.img), caption: t(is.title) }], 0)
+    );
+    iw.appendChild(img);
+    const body = h("div", "issue-body");
+    body.appendChild(h("h4", "", t(is.title)));
+    const sym = h("div", "issue-row",
+      `<span class="k k-sym">${state.lang === "zh" ? "现象" : "Symptom"}</span><span>${t(is.symptom)}</span>`);
+    const sol = h("div", "issue-row",
+      `<span class="k k-sol">${state.lang === "zh" ? "解决" : "Solution"}</span><span>${t(is.solution)}</span>`);
+    body.append(sym, sol);
+    if (is.links && is.links.length) {
+      const links = h("div", "issue-links");
+      is.links.forEach((url) => {
+        const a = h("a", "", url);
+        a.href = url;
+        a.target = "_blank";
+        links.appendChild(a);
+      });
+      body.appendChild(links);
+    }
+    card.append(iw, body);
+    issueList.appendChild(card);
+  });
+  root.appendChild(sectionWrap("issues", issueList));
 
   /* 画廊 */
   const galleryWrap = h("div", "");
@@ -397,65 +466,21 @@ function renderDetail(projectId) {
     const card = h("div", "doc-card");
     card.append(h("h4", "", t(d.title)), h("p", "note", t(d.note)));
     const actions = h("div", "doc-actions");
-    const preview = h("a", "btn btn-primary", state.lang === "zh" ? "预览" : "Preview");
-    preview.href = docPath(p, d.pdf);
-    preview.target = "_blank";
-    const download = h("a", "btn btn-ghost", state.lang === "zh" ? "下载 PPTX" : "PPTX");
-    download.href = docPath(p, d.pptx);
-    download.download = "";
-    actions.append(preview, download);
+    const view = h("a", "btn btn-primary", state.lang === "zh" ? "查看文档" : "View Document");
+    view.href = docPath(p, d.pdf);
+    view.target = "_blank";
+    actions.append(view);
     card.appendChild(actions);
     docGrid.appendChild(card);
   });
   root.appendChild(sectionWrap("docs", docGrid));
 
-  /* 问题 */
-  const issueList = h("div", "issue-list");
-  p.issues.forEach((is) => {
-    const card = h("div", "issue-card");
-    const iw = h("div", "issue-img-wrap");
-    const img = h("img");
-    img.src = imgPath(p, is.img);
-    img.alt = t(is.title);
-    img.loading = "lazy";
-    img.addEventListener("click", () =>
-      openLightbox([{ src: imgPath(p, is.img), caption: t(is.title) }], 0)
-    );
-    iw.appendChild(img);
-    const body = h("div", "issue-body");
-    body.appendChild(h("h4", "", t(is.title)));
-    const sym = h("div", "issue-row",
-      `<span class="k k-sym">${state.lang === "zh" ? "现象" : "Symptom"}</span><span>${t(is.symptom)}</span>`);
-    const sol = h("div", "issue-row",
-      `<span class="k k-sol">${state.lang === "zh" ? "解决" : "Solution"}</span><span>${t(is.solution)}</span>`);
-    body.append(sym, sol);
-    if (is.links && is.links.length) {
-      const links = h("div", "issue-links");
-      is.links.forEach((url) => {
-        const a = h("a", "", url);
-        a.href = url;
-        a.target = "_blank";
-        links.appendChild(a);
-      });
-      body.appendChild(links);
-    }
-    card.append(iw, body);
-    issueList.appendChild(card);
-  });
-  root.appendChild(sectionWrap("issues", issueList));
-
-  /* 参考资料 */
-  const refList = h("div", "ref-list");
-  p.references.forEach((r) => {
-    const item = h("div", "ref-item");
-    item.appendChild(h("span", "ref-title", t(r.title)));
-    const btn = h("a", "btn btn-ghost", state.lang === "zh" ? "查看 PDF" : "View PDF");
-    btn.href = docPath(p, r.file);
-    btn.target = "_blank";
-    item.appendChild(btn);
-    refList.appendChild(item);
-  });
-  root.appendChild(sectionWrap("references", refList));
+  /* 项目感想 */
+  if (p.reflections && p.reflections.length) {
+    const list = h("div", "contrib-list");
+    p.reflections.forEach((r) => list.appendChild(h("div", "contrib-item", t(r))));
+    root.appendChild(sectionWrap("reflections", list));
+  }
 
   root.appendChild(buildFooter());
   buildToc();
@@ -518,6 +543,14 @@ function observeToc(sections) {
 function detailHero(p) {
   const hero = h("header", "detail-hero toc-target");
   hero.id = "sec-overview";
+  if (p.heroImage) {
+    const bg = h("div", "hero-bg");
+    const img = h("img");
+    img.src = imgPath(p, p.heroImage);
+    img.alt = "";
+    bg.append(img, h("div", "hero-bg-mask"));
+    hero.appendChild(bg);
+  }
   const box = h("div", "container");
   const back = h("a", "back", `← ${state.lang === "zh" ? "返回首页" : "Back Home"}`);
   back.href = "index.html";

@@ -99,7 +99,7 @@ npx serve .
 2. 建立 `projects/<id>/`，把素材放进 `images/`、`videos/`、`docs/`
 3. 刷新页面——首页卡片与详情页自动出现
 
-可选字段：外部项目用 `externalUrl` 直接跳转；`contributions`、`background`、`goals`、`workflow`、`innovations`、`gallery`、`videos`、`docs`、`issues`、`references` 按需填写，未填的板块会自动隐藏。
+可选字段：外部项目用 `externalUrl` 直接跳转；`contributions`、`background`、`goals`、`workflow`、`innovations`、`journey`、`gallery`、`videos`、`docs`、`issues`、`reflections` 按需填写，未填的板块会自动隐藏。
 
 ---
 
