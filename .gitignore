@@ -1,5 +1,9 @@
 # 原始素材文件夹（仅本地保留，不提交）
 /无人机的智能楼宇自动取件系统/
+/基于复杂海洋环境的无人平台动态三维路径规划/
+
+# 海洋项目文档（页面已不展示文档模块，仅本地保留）
+/projects/ocean-path-planning/docs/
 
 # 系统文件
 Thumbs.db
@@ -9,3 +13,6 @@ desktop.ini
 # 编辑器
 .vscode/
 .idea/
+
+# 本地工具目录
+.workbuddy/

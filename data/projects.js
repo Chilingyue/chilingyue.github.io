@@ -393,6 +393,199 @@ const SITE_DATA = {
       ],
     },
 
+    /* ============================================================
+     * 海洋环境无人平台动态三维路径规划（完整详情项目）
+     * ============================================================ */
+    {
+      id: "ocean-path-planning",
+      title: {
+        zh: "基于复杂海洋环境的无人平台动态三维路径规划",
+        en: "Dynamic 3D Path Planning for Unmanned Platforms in Complex Ocean Environments",
+      },
+      subtitle: {
+        zh: "江苏省高校自然科学研究重大项目",
+        en: "Jiangsu Provincial Key University Natural Science Research Project",
+      },
+      period: "2024.09 – 2025.11",
+      cover: "projects/ocean-path-planning/images/risk-matrix.png",
+      heroImage: "risk-matrix.png",
+      tags: ["Python", "A*", "TSA*", "DQN", "ACO", "Risk Assessment", "NetCDF", "Path Planning"],
+
+      summary: {
+        zh: "面向水下无人平台（UUV）在复杂动态海洋环境中的自主航行问题，整合多源海洋数据并以双线性插补、栅格化完成预处理，构建多维动态风险评估模型；自主设计两阶段改进 A* 算法 TSA*，并搭建 Python 仿真平台，与蚁群、深度强化学习算法对比验证其在效率、路径与风险上的优势。",
+        en: "Addressing autonomous navigation of unmanned underwater vehicles (UUVs) in complex dynamic ocean environments, this project integrates multi-source ocean data and preprocesses it with bilinear interpolation and rasterization to build a multidimensional dynamic risk model; it designs a two-stage improved A* algorithm (TSA*) and builds a Python simulation platform, validating its advantages in efficiency, path length and risk against ant-colony and deep reinforcement-learning baselines.",
+      },
+
+      metrics: [
+        { value: "36.5%", label: { zh: "路径效率提升（路径长度优势）", en: "Path-efficiency improvement (path-length advantage)" } },
+        { value: "33.5%", label: { zh: "风险管控指标提升", en: "Risk-control improvement" } },
+        { value: "60", label: { zh: "仿真测试实例", en: "Simulation test cases" } },
+        { value: "3", label: { zh: "算法对比验证", en: "Algorithms compared" } },
+      ],
+
+      contributions: [
+        {
+          zh: "负责<strong>多源异构环境数据预处理与特征工程</strong>，采用双线性插补、栅格化完成数据清洗、空间标准化与异常值排查，构建<strong>多维动态风险评估模型</strong>，挖掘区域潜在风险，为无人平台安全决策提供量化依据。",
+          en: "Led <strong>preprocessing and feature engineering for multi-source heterogeneous data</strong>, using bilinear interpolation and rasterization for data cleaning, spatial standardization and outlier detection; built a <strong>multidimensional dynamic risk-assessment model</strong> that quantifies regional potential risk to support safe decision-making.",
+        },
+        {
+          zh: "负责 <strong>A* 多目标路径规划算法的设计与实现</strong>，协同推进 DQN、蚁群算法落地；针对复杂风险场景优化搜索策略，完成多轮消融实验与对比验证，路径效率与风险管控指标分别提升 <strong>36.5%、33.5%</strong>。",
+          en: "Owned the <strong>design and implementation of the A* multi-objective path-planning algorithm</strong> and coordinated the DQN and ant-colony baselines; optimized the search strategy for complex risk scenarios and ran ablation and comparison experiments, improving path efficiency and risk control by <strong>36.5% and 33.5%</strong>.",
+        },
+        {
+          zh: "参与搭建 <strong>Python 端无人平台路径规划仿真平台</strong>，负责路径安全校验与参数测算模块开发；设计多场景测试用例，完成算法功能测试、性能测试与效果分析，输出规范的实验报告。",
+          en: "Co-built the <strong>Python simulation platform for UUV path planning</strong>, developing the path-safety check and parameter-estimation modules; designed multi-scenario test cases, ran functional and performance tests with effect analysis, and produced standardized experiment reports.",
+        },
+        {
+          zh: "负责项目后期的<strong>多源数据对齐校验与仿真平台运维</strong>，排查数据与模型运行问题，保障仿真平台稳定性。",
+          en: "Took charge of late-stage <strong>multi-source data alignment/validation and simulation-platform maintenance</strong>, troubleshooting data and model issues to keep the platform stable.",
+        },
+      ],
+
+      background: [
+        {
+          label: { zh: "环境挑战", en: "Environment" },
+          points: [
+            { zh: "洋流、地形、气象等要素动态变化，任务不确定性高", en: "Currents, terrain and weather change dynamically with high uncertainty" },
+            { zh: "海洋空间强非线性，设备动力学约束复杂", en: "Strongly nonlinear ocean space with complex vehicle dynamics" },
+            { zh: "内波、海洋锋、海底起伏带来航行与隐蔽风险", en: "Internal waves, ocean fronts and seabed relief create safety and stealth risks" },
+          ],
+        },
+        {
+          label: { zh: "技术瓶颈", en: "Bottlenecks" },
+          points: [
+            { zh: "三维 A* 搜索时间从毫秒级飙升至数小时", en: "3D A* search time jumps from milliseconds to hours" },
+            { zh: "高维栅格导致维度灾难，实时性难以保障", en: "High-dimensional grids cause the curse of dimensionality" },
+            { zh: "路径长度、能耗、安全多目标相互冲突", en: "Path length, energy and safety objectives conflict" },
+          ],
+        },
+        {
+          label: { zh: "项目切入", en: "Our Approach" },
+          points: [
+            { zh: "多源数据预处理，量化生成多维风险矩阵", en: "Preprocess multi-source data into quantified risk matrices" },
+            { zh: "两阶段 TSA* 算法降维，降低计算复杂度", en: "Two-stage TSA* reduces dimensionality and complexity" },
+            { zh: "自建仿真平台，多算法对比验证", en: "Build a simulation platform for multi-algorithm validation" },
+          ],
+        },
+      ],
+
+      /* ---- 数据处理管线（步骤 + 配图）---- */
+      pipeline: {
+        steps: [
+          { title: { zh: "多源数据采集", en: "Multi-source Acquisition" }, desc: { zh: "CMEMS 与航次数据，覆盖流速、流向、温盐、波浪、地形", en: "CMEMS and voyage data: currents, direction, temperature, salinity, waves, terrain" } },
+          { title: { zh: "格式统一", en: "Format Unification" }, desc: { zh: "NetCDF / HDF5 / MAT / TXT 统一为 NetCDF（.nc）", en: "Unify NetCDF/HDF5/MAT/TXT into NetCDF (.nc)" } },
+          { title: { zh: "双线性插补", en: "Bilinear Interpolation" }, desc: { zh: "对缺失与异常值插补，提升数据完整性与精度", en: "Fill missing and abnormal values to improve completeness and accuracy" } },
+          { title: { zh: "栅格化与标准化", en: "Rasterization" }, desc: { zh: "经纬度转栅格坐标，空间标准化、坐标系统一", en: "Convert coordinates to a raster with unified spatial standards" } },
+          { title: { zh: "多维风险矩阵", en: "Risk Matrix" }, desc: { zh: "各变量归一化加权求和，划分风险等级", en: "Normalize and weight variables to grade risk levels" } },
+        ],
+        figures: [
+          { file: "tech-roadmap.png", caption: { zh: "总体技术路线", en: "Overall technical roadmap" } },
+          { file: "data-preprocess-flow.png", caption: { zh: "数据集预处理流程", en: "Dataset preprocessing workflow" } },
+          { file: "data-source.png", caption: { zh: "多源海洋数据获取", en: "Multi-source ocean data acquisition" } },
+          { file: "bilinear-interp.png", caption: { zh: "双线性插补缺失值", en: "Bilinear interpolation of missing values" } },
+        ],
+      },
+
+      /* ---- 算法对比（纯 CSS 条形图，分数为表现得分，越大越好；数据来自论文图4.10）---- */
+      comparison: {
+        algorithms: [
+          { key: "tsa", name: { zh: "TSA*（本项目）", en: "TSA* (ours)" }, highlight: true },
+          { key: "dqn", name: { zh: "DQN", en: "DQN" }, highlight: false },
+          { key: "aco", name: { zh: "蚁群 ACO", en: "ACO" }, highlight: false },
+        ],
+        note: {
+          zh: "各维度均为相对表现得分（越高越好），以 TSA* 为基准 1.000；条形越长代表该维度表现越优。",
+          en: "All dimensions are relative performance scores (higher is better) with TSA* as the 1.000 baseline; a longer bar means better performance.",
+        },
+        dimensions: [
+          { label: { zh: "计算效率", en: "Computing Efficiency" }, scores: { tsa: 1.0, dqn: 0.364, aco: 0.34 } },
+          { label: { zh: "路径长度优势", en: "Path Length Advantage" }, scores: { tsa: 1.0, dqn: 0.733, aco: 0.336 } },
+          { label: { zh: "风险控制能力", en: "Risk Control" }, scores: { tsa: 1.0, dqn: 0.749, aco: 0.349 } },
+          { label: { zh: "综合表现", en: "Overall Performance" }, scores: { tsa: 1.0, dqn: 0.732, aco: 0.342 } },
+        ],
+        figure: { file: "algo-score.png", caption: { zh: "各算法得分综合对比（原始图）", en: "Comprehensive score comparison (original chart)" } },
+      },
+
+      /* ---- TSA* 算法设计（两阶段 + 机制 + 配图）---- */
+      algorithm: {
+        stages: [
+          {
+            title: { zh: "第一阶段 · 二维平面寻优", en: "Stage 1 · 2D Plane Optimization" },
+            desc: { zh: "将三维环境投影到二维平面，在四邻域上以综合风险与总代价搜索最优二维路径，快速确定 X、Y 坐标，规避高维搜索的计算爆炸。", en: "Project the 3D environment onto a 2D plane and search the optimal path over four-neighborhood nodes using risk and total cost, quickly fixing X/Y coordinates while avoiding the computational explosion of high-dimensional search." },
+          },
+          {
+            title: { zh: "第二阶段 · 垂直高度优化", en: "Stage 2 · Vertical Height Optimization" },
+            desc: { zh: "为每个二维路径点在 0–50 米范围内按步长取样，在满足距离约束与渐进性条件下选取代价最低的高度，生成完整三维路径。", en: "For each 2D waypoint, sample heights within 0–50 m and select the lowest-cost height under distance and continuity constraints, producing the full 3D path." },
+          },
+        ],
+        mechanisms: [
+          { zh: "<strong>动态风险适应</strong>：节点扩展时依据当前航速与环境实时更新风险，在高风险区限制航速，权衡速度与安全。", en: "<strong>Dynamic risk adaptation</strong>: update risk at each node expansion based on current speed and environment, limiting speed in high-risk areas to balance speed and safety." },
+          { zh: "<strong>静态风险规避</strong>：在搜索中避开海底地形、礁石、沉船等固定风险因素。", en: "<strong>Static risk avoidance</strong>: steer clear of fixed factors such as terrain, reefs and wrecks during search." },
+          { zh: "<strong>三次 B 样条平滑</strong>：对拐点做控制点平滑，保证路径连续、可操作，避免穿过限制区域。", en: "<strong>Cubic B-spline smoothing</strong>: smooth corners via control points for a continuous, feasible path without crossing restricted areas." },
+        ],
+        figures: [
+          { file: "tsa-flowchart.jpg", caption: { zh: "TSA* 算法流程", en: "TSA* algorithm flowchart" } },
+          { file: "grid-directions.png", caption: { zh: "栅格方向划分（2D 八方向 / 3D 二十六方向）", en: "Grid directions (8 in 2D / 26 in 3D)" } },
+          { file: "corner-smoothing.png", caption: { zh: "拐点平滑示意", en: "Corner smoothing" } },
+          { file: "aco-flowchart.jpg", caption: { zh: "对比：蚁群优化流程", en: "Baseline: ant-colony optimization flow" } },
+        ],
+      },
+
+      gallery: [
+        {
+          key: "data-result",
+          label: { zh: "数据处理结果", en: "Data Processing Results" },
+          images: [
+            { file: "current-interp.png", caption: { zh: "海流数据插补结果", en: "Current data interpolation result" } },
+            { file: "temp-interp.png", caption: { zh: "温度数据插补结果", en: "Temperature data interpolation result" } },
+          ],
+        },
+        {
+          key: "risk",
+          label: { zh: "风险评估", en: "Risk Assessment" },
+          images: [
+            { file: "risk-result.png", caption: { zh: "风险评估结果（示例）", en: "Risk assessment result (example)" } },
+            { file: "risk-zoning-3d.png", caption: { zh: "综合风险三维区划", en: "3D comprehensive risk zoning" } },
+          ],
+        },
+        {
+          key: "paths",
+          label: { zh: "路径规划结果", en: "Path Planning Results" },
+          images: [
+            { file: "path-2d.png", caption: { zh: "TSA* 二维路径", en: "TSA* 2D path" } },
+            { file: "path-3d.png", caption: { zh: "TSA* 三维路径", en: "TSA* 3D path" } },
+            { file: "dqn-path-2d.png", caption: { zh: "DQN 二维路径", en: "DQN 2D path" } },
+            { file: "aco-path-2d.png", caption: { zh: "蚁群二维路径", en: "ACO 2D path" } },
+          ],
+        },
+        {
+          key: "platform",
+          label: { zh: "仿真平台界面", en: "Simulation Platform UI" },
+          images: [
+            { file: "platform-main.png", caption: { zh: "路径规划主界面", en: "Path planning main interface" } },
+            { file: "platform-data.png", caption: { zh: "数据预处理界面", en: "Data preprocessing interface" } },
+            { file: "platform-risk.png", caption: { zh: "安全风险评估界面", en: "Safety risk assessment interface" } },
+            { file: "platform-simulation.png", caption: { zh: "模拟实验界面", en: "Simulation experiment interface" } },
+          ],
+        },
+      ],
+
+      reflections: [
+        {
+          zh: "<strong>数据质量决定算法上限</strong>：真实海洋数据普遍存在缺失、格式异构与精度不一，只有把预处理与风险量化做扎实，后续的路径规划才有可靠的决策基础。",
+          en: "<strong>Data quality sets the algorithm ceiling</strong>: real ocean data is incomplete, heterogeneous and inconsistent in precision; solid preprocessing and risk quantification are the only reliable foundation for downstream planning.",
+        },
+        {
+          zh: "<strong>降维是应对高复杂度的关键思路</strong>：把三维搜索拆成「二维寻优 + 高度优化」两阶段，在保证路径可行与平滑的同时大幅降低了计算开销，这是工程上对效率与质量的有效平衡。",
+          en: "<strong>Dimensional reduction is key to high complexity</strong>: splitting 3D search into 2D optimization plus height optimization cuts computation greatly while keeping the path feasible and smooth — an effective engineering trade-off.",
+        },
+        {
+          zh: "<strong>对比实验与平台运维同样重要</strong>：多算法、多场景的对比验证让结论可信，而后期的数据对齐与平台稳定性保障，才让整套系统真正可复用。",
+          en: "<strong>Comparison and maintenance matter too</strong>: multi-algorithm, multi-scenario validation makes conclusions credible, while late-stage data alignment and platform stability keep the whole system reusable.",
+        },
+      ],
+    },
+
     /* ---- 外部链接项目：点击卡片直接打开已有的 GitHub Pages 页面 ---- */
     {
       id: "3d-minesweeper",

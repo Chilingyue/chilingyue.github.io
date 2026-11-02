@@ -264,6 +264,9 @@ const LABELS = {
   metrics: { zh: "关键指标", en: "Key Metrics" },
   background: { zh: "项目背景", en: "Background" },
   contributions: { zh: "我的工作与贡献", en: "My Contributions" },
+  pipeline: { zh: "技术路线与数据管线", en: "Technical Roadmap & Data Pipeline" },
+  comparison: { zh: "算法对比", en: "Algorithm Comparison" },
+  algorithm: { zh: "TSA* 算法设计", en: "TSA* Algorithm Design" },
   journey: { zh: "探索历程", en: "Journey" },
   goals: { zh: "项目目标", en: "Goals" },
   workflow: { zh: "工作流程", en: "Workflow" },
@@ -272,7 +275,7 @@ const LABELS = {
   videos: { zh: "视频演示", en: "Videos" },
   docs: { zh: "过程文档", en: "Process Documents" },
   issues: { zh: "问题与解决", en: "Issues & Solutions" },
-  reflections: { zh: "项目感想", en: "Reflections" },
+  reflections: { zh: "项目总结", en: "Summary" },
 };
 
 function sectionWrap(labelKey, contentNode) {
@@ -328,39 +331,54 @@ function renderDetail(projectId) {
       bgGrid.appendChild(card);
     });
     root.appendChild(sectionWrap("background", bgGrid));
-  } else {
+  } else if (p.background) {
     root.appendChild(
       sectionWrap("background", h("div", "prose", `<p>${t(p.background)}</p>`))
     );
   }
 
+  /* 技术路线与数据管线 */
+  if (p.pipeline) root.appendChild(sectionWrap("pipeline", buildPipeline(p)));
+
+  /* 算法对比（纯 CSS 条形图）*/
+  if (p.comparison) root.appendChild(sectionWrap("comparison", buildComparison(p)));
+
+  /* TSA* 算法设计 */
+  if (p.algorithm) root.appendChild(sectionWrap("algorithm", buildAlgorithm(p)));
+
   /* 目标 */
-  const goalList = h("ul", "list-card");
-  p.goals.forEach((g) => goalList.appendChild(h("li", "", t(g))));
-  root.appendChild(sectionWrap("goals", goalList));
+  if (p.goals) {
+    const goalList = h("ul", "list-card");
+    p.goals.forEach((g) => goalList.appendChild(h("li", "", t(g))));
+    root.appendChild(sectionWrap("goals", goalList));
+  }
 
   /* 创新点 */
-  const innoList = h("ul", "list-card");
-  p.innovations.forEach((i) => innoList.appendChild(h("li", "", t(i))));
-  root.appendChild(sectionWrap("innovations", innoList));
+  if (p.innovations) {
+    const innoList = h("ul", "list-card");
+    p.innovations.forEach((i) => innoList.appendChild(h("li", "", t(i))));
+    root.appendChild(sectionWrap("innovations", innoList));
+  }
 
   /* 工作流程：大波浪时间线，奇数步在波峰上方、偶数步在波谷下方 */
-  const flow = h("div", "flow-wrap");
-  const wave = h("div", "flow-wave");
-  wave.innerHTML =
-    '<svg viewBox="0 0 1000 96" preserveAspectRatio="none" aria-hidden="true">' +
-    '<path d="M0,48 Q100,-6 200,48 Q300,102 400,48 Q500,-6 600,48 Q700,102 800,48 Q900,-6 1000,48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-opacity="0.5" vector-effect="non-scaling-stroke"/>' +
-    "</svg>";
-  const grid = h("div", "flow-grid");
-  p.workflow.forEach((w, i) => {
-    const item = h("div", "flow-item " + (i % 2 === 0 ? "up" : "down"));
-    const body = h("div", "flow-body");
-    body.append(h("h4", "", t(w.title)), h("p", "", t(w.desc)));
-    item.append(body, h("div", "num", w.step));
-    grid.appendChild(item);
-  });
-  flow.append(wave, grid);
-  root.appendChild(sectionWrap("workflow", flow));
+  if (p.workflow) {
+    const flow = h("div", "flow-wrap");
+    const wave = h("div", "flow-wave");
+    wave.innerHTML =
+      '<svg viewBox="0 0 1000 96" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M0,48 Q100,-6 200,48 Q300,102 400,48 Q500,-6 600,48 Q700,102 800,48 Q900,-6 1000,48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-opacity="0.5" vector-effect="non-scaling-stroke"/>' +
+      "</svg>";
+    const wfGrid = h("div", "flow-grid");
+    p.workflow.forEach((w, i) => {
+      const item = h("div", "flow-item " + (i % 2 === 0 ? "up" : "down"));
+      const body = h("div", "flow-body");
+      body.append(h("h4", "", t(w.title)), h("p", "", t(w.desc)));
+      item.append(body, h("div", "num", w.step));
+      wfGrid.appendChild(item);
+    });
+    flow.append(wave, wfGrid);
+    root.appendChild(sectionWrap("workflow", flow));
+  }
 
   /* 探索历程 */
   if (p.journey && p.journey.length) {
@@ -377,43 +395,46 @@ function renderDetail(projectId) {
   }
 
   /* 问题与解决 */
-  const issueList = h("div", "issue-list");
-  p.issues.forEach((is) => {
-    const card = h("div", "issue-card");
-    const iw = h("div", "issue-img-wrap");
-    const img = h("img");
-    img.src = imgPath(p, is.img);
-    img.alt = t(is.title);
-    img.loading = "lazy";
-    img.addEventListener("click", () =>
-      openLightbox([{ src: imgPath(p, is.img), caption: t(is.title) }], 0)
-    );
-    iw.appendChild(img);
-    const body = h("div", "issue-body");
-    body.appendChild(h("h4", "", t(is.title)));
-    const sym = h("div", "issue-row",
-      `<span class="k k-sym">${state.lang === "zh" ? "现象" : "Symptom"}</span><span>${t(is.symptom)}</span>`);
-    const sol = h("div", "issue-row",
-      `<span class="k k-sol">${state.lang === "zh" ? "解决" : "Solution"}</span><span>${t(is.solution)}</span>`);
-    body.append(sym, sol);
-    if (is.links && is.links.length) {
-      const links = h("div", "issue-links");
-      is.links.forEach((url) => {
-        const a = h("a", "", url);
-        a.href = url;
-        a.target = "_blank";
-        links.appendChild(a);
-      });
-      body.appendChild(links);
-    }
-    card.append(iw, body);
-    issueList.appendChild(card);
-  });
-  root.appendChild(sectionWrap("issues", issueList));
+  if (p.issues) {
+    const issueList = h("div", "issue-list");
+    p.issues.forEach((is) => {
+      const card = h("div", "issue-card");
+      const iw = h("div", "issue-img-wrap");
+      const img = h("img");
+      img.src = imgPath(p, is.img);
+      img.alt = t(is.title);
+      img.loading = "lazy";
+      img.addEventListener("click", () =>
+        openLightbox([{ src: imgPath(p, is.img), caption: t(is.title) }], 0)
+      );
+      iw.appendChild(img);
+      const body = h("div", "issue-body");
+      body.appendChild(h("h4", "", t(is.title)));
+      const sym = h("div", "issue-row",
+        `<span class="k k-sym">${state.lang === "zh" ? "现象" : "Symptom"}</span><span>${t(is.symptom)}</span>`);
+      const sol = h("div", "issue-row",
+        `<span class="k k-sol">${state.lang === "zh" ? "解决" : "Solution"}</span><span>${t(is.solution)}</span>`);
+      body.append(sym, sol);
+      if (is.links && is.links.length) {
+        const links = h("div", "issue-links");
+        is.links.forEach((url) => {
+          const a = h("a", "", url);
+          a.href = url;
+          a.target = "_blank";
+          links.appendChild(a);
+        });
+        body.appendChild(links);
+      }
+      card.append(iw, body);
+      issueList.appendChild(card);
+    });
+    root.appendChild(sectionWrap("issues", issueList));
+  }
 
   /* 画廊 */
-  const galleryWrap = h("div", "");
-  p.gallery.forEach((group) => {
+  if (p.gallery) {
+    const galleryWrap = h("div", "");
+    p.gallery.forEach((group) => {
     const g = h("div", "gallery-group");
     g.appendChild(h("h3", "", t(group.label)));
     const grid = h("div", "gallery-grid");
@@ -435,12 +456,14 @@ function renderDetail(projectId) {
     });
     g.appendChild(grid);
     galleryWrap.appendChild(g);
-  });
-  root.appendChild(sectionWrap("gallery", galleryWrap));
+    });
+    root.appendChild(sectionWrap("gallery", galleryWrap));
+  }
 
   /* 视频 */
-  const videoGrid = h("div", "video-grid");
-  p.videos.forEach((v) => {
+  if (p.videos) {
+    const videoGrid = h("div", "video-grid");
+    p.videos.forEach((v) => {
     const card = h("div", "video-card");
     const video = h("video");
     video.controls = true;
@@ -457,23 +480,34 @@ function renderDetail(projectId) {
     );
     card.append(video, info);
     videoGrid.appendChild(card);
-  });
-  root.appendChild(sectionWrap("videos", videoGrid));
+    });
+    root.appendChild(sectionWrap("videos", videoGrid));
+  }
 
   /* 文档 */
-  const docGrid = h("div", "doc-grid");
-  p.docs.forEach((d) => {
-    const card = h("div", "doc-card");
-    card.append(h("h4", "", t(d.title)), h("p", "note", t(d.note)));
-    const actions = h("div", "doc-actions");
-    const view = h("a", "btn btn-primary", state.lang === "zh" ? "查看文档" : "View Document");
-    view.href = docPath(p, d.pdf);
-    view.target = "_blank";
-    actions.append(view);
-    card.appendChild(actions);
-    docGrid.appendChild(card);
-  });
-  root.appendChild(sectionWrap("docs", docGrid));
+  if (p.docs) {
+    const docGrid = h("div", "doc-grid");
+    p.docs.forEach((d) => {
+      const card = h("div", "doc-card");
+      card.append(h("h4", "", t(d.title)), h("p", "note", t(d.note)));
+      const actions = h("div", "doc-actions");
+      const view = h("a", "btn btn-primary", state.lang === "zh" ? "查看文档" : "View Document");
+      view.href = docPath(p, d.pdf);
+      view.target = "_blank";
+      actions.append(view);
+      // 可下载源文件（docx / pptx）
+      const dlFile = d.docx || d.pptx;
+      if (dlFile) {
+        const dl = h("a", "btn btn-ghost", state.lang === "zh" ? "下载源文件" : "Download");
+        dl.href = docPath(p, dlFile);
+        dl.setAttribute("download", "");
+        actions.append(dl);
+      }
+      card.appendChild(actions);
+      docGrid.appendChild(card);
+    });
+    root.appendChild(sectionWrap("docs", docGrid));
+  }
 
   /* 项目感想 */
   if (p.reflections && p.reflections.length) {
@@ -485,6 +519,83 @@ function renderDetail(projectId) {
   root.appendChild(buildFooter());
   buildToc();
   observeReveal();
+}
+
+/* ============================================================
+ * 海洋项目：配图网格（点击灯箱放大）
+ * ============================================================ */
+function buildFigureGrid(p, figures) {
+  const grid = h("div", "figure-grid");
+  const slides = figures.map((f) => ({ src: imgPath(p, f.file), caption: t(f.caption) }));
+  figures.forEach((f, idx) => {
+    const cell = h("figure", "figure-cell");
+    const img = h("img");
+    img.src = imgPath(p, f.file);
+    img.alt = t(f.caption);
+    img.loading = "lazy";
+    cell.append(img, h("figcaption", "", t(f.caption)));
+    cell.addEventListener("click", () => openLightbox(slides, idx));
+    grid.appendChild(cell);
+  });
+  return grid;
+}
+
+/* 技术路线与数据管线：5 步流程 + 配图 */
+function buildPipeline(p) {
+  const wrap = h("div", "pipeline-wrap");
+  const steps = h("div", "pipeline-steps");
+  p.pipeline.steps.forEach((s, i) => {
+    const card = h("div", "pipeline-step");
+    card.appendChild(h("span", "pipeline-idx", String(i + 1)));
+    card.append(h("h4", "", t(s.title)), h("p", "", t(s.desc)));
+    steps.appendChild(card);
+  });
+  wrap.appendChild(steps);
+  wrap.appendChild(buildFigureGrid(p, p.pipeline.figures));
+  return wrap;
+}
+
+/* 算法对比：纯 CSS 分组条形图（条宽按该维度最大值归一化）+ 原始图 */
+function buildComparison(p) {
+  const wrap = h("div", "comparison-wrap");
+  const c = p.comparison;
+  if (c.note) wrap.appendChild(h("p", "cmp-note", t(c.note)));
+  c.dimensions.forEach((dim) => {
+    const group = h("div", "cmp-group");
+    group.appendChild(h("h4", "cmp-dim", t(dim.label)));
+    const max = Math.max(...c.algorithms.map((a) => dim.scores[a.key]));
+    c.algorithms.forEach((a) => {
+      const score = dim.scores[a.key];
+      const pct = Math.round((score / max) * 100);
+      const row = h("div", "cmp-row" + (a.highlight ? " is-best" : ""));
+      const track = h("div", "cmp-track");
+      const bar = h("div", "cmp-bar");
+      bar.style.width = pct + "%";
+      track.appendChild(bar);
+      row.append(h("span", "cmp-name", t(a.name)), track, h("span", "cmp-val", score.toFixed(3)));
+      group.appendChild(row);
+    });
+    wrap.appendChild(group);
+  });
+  if (c.figure) wrap.appendChild(buildFigureGrid(p, [c.figure]));
+  return wrap;
+}
+
+/* TSA* 算法设计：两阶段 + 机制 + 配图 */
+function buildAlgorithm(p) {
+  const wrap = h("div", "algorithm-wrap");
+  const stages = h("div", "algo-stages");
+  p.algorithm.stages.forEach((s) => {
+    const card = h("div", "algo-stage");
+    card.append(h("h4", "", t(s.title)), h("p", "", t(s.desc)));
+    stages.appendChild(card);
+  });
+  wrap.appendChild(stages);
+  const mech = h("ul", "list-card");
+  p.algorithm.mechanisms.forEach((m) => mech.appendChild(h("li", "", t(m))));
+  wrap.appendChild(mech);
+  wrap.appendChild(buildFigureGrid(p, p.algorithm.figures));
+  return wrap;
 }
 
 /* ============================================================
