@@ -438,10 +438,8 @@ function renderDetail(projectId) {
     const g = h("div", "gallery-group");
     g.appendChild(h("h3", "", t(group.label)));
     const grid = h("div", "gallery-grid");
-    if (group.cols) {
-      grid.classList.add("cols-" + group.cols);
-      grid.style.setProperty("--gcols", group.cols);
-    }
+    if (group.cols) grid.classList.add("cols-" + group.cols);
+    if (group.pair) grid.classList.add("pair-rows");
     const slides = group.images.map((im) => ({
       src: imgPath(p, im.file),
       caption: t(im.caption),
@@ -526,40 +524,79 @@ function renderDetail(projectId) {
 }
 
 /* ============================================================
- * 海洋项目：配图网格（点击灯箱放大）
+ * 海洋项目：单张配图卡（点击灯箱，slides 内可左右翻）
  * ============================================================ */
-function buildFigureGrid(p, figures) {
-  const grid = h("div", "figure-grid");
-  const slides = figures.map((f) => ({ src: imgPath(p, f.file), caption: t(f.caption) }));
-  figures.forEach((f, idx) => {
-    const cell = h("figure", "figure-cell");
-    const img = h("img");
-    img.src = imgPath(p, f.file);
-    img.alt = t(f.caption);
-    img.loading = "lazy";
-    cell.append(img, h("figcaption", "", t(f.caption)));
-    cell.addEventListener("click", () => openLightbox(slides, idx));
-    grid.appendChild(cell);
-  });
-  return grid;
+function figCard(p, f, slides, idx, extraClass) {
+  const fig = h("figure", "fig-card" + (extraClass ? " " + extraClass : ""));
+  const img = h("img");
+  img.src = imgPath(p, f.file);
+  img.alt = t(f.caption);
+  img.loading = "lazy";
+  fig.append(img, h("figcaption", "", t(f.caption)));
+  fig.addEventListener("click", () => openLightbox(slides, idx));
+  return fig;
+}
+function toSlides(p, list) {
+  return list.map((f) => ({ src: imgPath(p, f.file), caption: t(f.caption) }));
 }
 
-/* 技术路线与数据管线：5 步流程 + 配图 */
+/* 技术路线与数据管线：五层总览 → 5 步流程 → 每步配图 */
 function buildPipeline(p) {
   const wrap = h("div", "pipeline-wrap");
+  const pl = p.pipeline;
+
+  /* 1) 总览：五层结构 + 技术路线图 */
+  if (pl.overview) {
+    const ov = h("div", "pipe-overview");
+    const txt = h("div", "pipe-overview-text");
+    txt.appendChild(h("h4", "", t(pl.overview.title)));
+    if (pl.overview.layers) {
+      const ol = h("ol", "layer-list");
+      pl.overview.layers.forEach((l, i) => {
+        const li = h("li", "layer-item" + (l.here ? " is-here" : ""));
+        li.append(h("span", "layer-no", String(i + 1)), h("span", "layer-name", t(l)));
+        if (l.here) li.appendChild(h("span", "layer-flag", t(pl.overview.hereLabel)));
+        ol.appendChild(li);
+      });
+      txt.appendChild(ol);
+    }
+    txt.appendChild(h("p", "layer-note", t(pl.overview.note)));
+    ov.append(txt, figCard(p, pl.overview, toSlides(p, [pl.overview]), 0, "pipe-overview-fig"));
+    wrap.appendChild(ov);
+  }
+
+  /* 2) 五步流程 */
   const steps = h("div", "pipeline-steps");
-  p.pipeline.steps.forEach((s, i) => {
+  pl.steps.forEach((s, i) => {
     const card = h("div", "pipeline-step");
     card.appendChild(h("span", "pipeline-idx", String(i + 1)));
     card.append(h("h4", "", t(s.title)), h("p", "", t(s.desc)));
     steps.appendChild(card);
   });
   wrap.appendChild(steps);
-  wrap.appendChild(buildFigureGrid(p, p.pipeline.figures));
+
+  /* 3) 分步配图：每张图挂在它所属的步骤上 */
+  if (pl.details && pl.details.length) {
+    const slides = toSlides(p, pl.details);
+    if (pl.detailsLabel) wrap.appendChild(h("h4", "block-sub", t(pl.detailsLabel)));
+    const list = h("div", "pipe-details");
+    pl.details.forEach((d, i) => {
+      const item = h("div", "pipe-detail");
+      const head = h("div", "pipe-detail-head");
+      head.append(h("span", "pipe-step-tag", t(d.step)), h("h5", "", t(d.caption)));
+      const body = h("div", "pipe-detail-body");
+      const note = h("div", "pipe-detail-note");
+      note.appendChild(h("p", "", t(d.note)));
+      body.append(note, figCard(p, d, slides, i, "pipe-detail-fig"));
+      item.append(head, body);
+      list.appendChild(item);
+    });
+    wrap.appendChild(list);
+  }
   return wrap;
 }
 
-/* 算法对比：纯 CSS 分组条形图（条宽按该维度最大值归一化）+ 原始图 */
+/* 算法对比：纯 CSS 分组条形图（条宽按该维度最大值归一化）+ 得分图与基线流程 */
 function buildComparison(p) {
   const wrap = h("div", "comparison-wrap");
   const c = p.comparison;
@@ -581,24 +618,66 @@ function buildComparison(p) {
     });
     wrap.appendChild(group);
   });
-  if (c.figure) wrap.appendChild(buildFigureGrid(p, [c.figure]));
+  if (c.figures && c.figures.length) {
+    const row = h("div", "cmp-figs" + (c.figures.length > 1 ? " has-side" : ""));
+    const slides = toSlides(p, c.figures);
+    c.figures.forEach((f, i) => row.appendChild(figCard(p, f, slides, i)));
+    wrap.appendChild(row);
+  }
   return wrap;
 }
 
-/* TSA* 算法设计：两阶段 + 机制 + 配图 */
+/* TSA* 算法设计：左（两阶段串联 + 机制）右（主流程图）+ 支撑图 */
 function buildAlgorithm(p) {
   const wrap = h("div", "algorithm-wrap");
-  const stages = h("div", "algo-stages");
-  p.algorithm.stages.forEach((s) => {
-    const card = h("div", "algo-stage");
-    card.append(h("h4", "", t(s.title)), h("p", "", t(s.desc)));
-    stages.appendChild(card);
+  const a = p.algorithm;
+
+  const layout = h("div", "algo-layout");
+  const left = h("div", "algo-left");
+
+  const flow = h("div", "algo-flow");
+  a.stages.forEach((s, i) => {
+    const stage = h("div", "algo-stage");
+    const head = h("div", "algo-stage-head");
+    head.append(h("span", "algo-stage-no", String(i + 1)), h("h4", "", t(s.title)));
+    stage.append(head, h("p", "", t(s.desc)));
+    if (s.io) stage.appendChild(h("p", "algo-stage-io", t(s.io)));
+    flow.appendChild(stage);
+    if (i < a.stages.length - 1) flow.appendChild(h("div", "algo-flow-arrow", "↓"));
   });
-  wrap.appendChild(stages);
-  const mech = h("ul", "list-card");
-  p.algorithm.mechanisms.forEach((m) => mech.appendChild(h("li", "", t(m))));
-  wrap.appendChild(mech);
-  wrap.appendChild(buildFigureGrid(p, p.algorithm.figures));
+  left.appendChild(flow);
+
+  const mech = h("ul", "algo-mech");
+  a.mechanisms.forEach((m) => {
+    const li = h("li", "");
+    li.append(h("strong", "", t(m.title)), h("span", "", t(m.desc)));
+    mech.appendChild(li);
+  });
+  left.appendChild(mech);
+  layout.appendChild(left);
+
+  if (a.lead) {
+    const lead = h("div", "algo-lead");
+    lead.append(
+      figCard(p, a.lead, toSlides(p, [a.lead]), 0, "algo-lead-fig"),
+      h("p", "algo-lead-note", t(a.lead.note))
+    );
+    layout.appendChild(lead);
+  }
+  wrap.appendChild(layout);
+
+  if (a.supports && a.supports.length) {
+    const slides = toSlides(p, a.supports);
+    if (a.supportsLabel) wrap.appendChild(h("h4", "block-sub", t(a.supportsLabel)));
+    const sup = h("div", "algo-supports");
+    a.supports.forEach((s, i) => {
+      const card = h("div", "algo-support");
+      card.appendChild(h("span", "algo-support-tag", t(s.tag)));
+      card.append(figCard(p, s, slides, i, "algo-support-fig"), h("p", "algo-support-note", t(s.note)));
+      sup.appendChild(card);
+    });
+    wrap.appendChild(sup);
+  }
   return wrap;
 }
 

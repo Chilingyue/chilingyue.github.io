@@ -469,8 +469,25 @@ const SITE_DATA = {
         },
       ],
 
-      /* ---- 数据处理管线（步骤 + 配图）---- */
+      /* ---- 数据处理管线（总览 + 步骤 + 分步配图）---- */
       pipeline: {
+        overview: {
+          title: { zh: "这条数据管线在整体技术路线中的位置", en: "Where this data pipeline sits in the roadmap" },
+          layers: [
+            { zh: "数据处理", en: "Data processing", here: true },
+            { zh: "机理分析", en: "Mechanism analysis" },
+            { zh: "风险评估", en: "Risk assessment" },
+            { zh: "算法设计", en: "Algorithm design" },
+            { zh: "试验验证", en: "Validation" },
+          ],
+          hereLabel: { zh: "本节", en: "here" },
+          note: {
+            zh: "五层自上而下依次推进。本节展开最上层的「数据处理」，也就是下面的 5 个步骤——它决定了后面所有模型的输入质量。",
+            en: "The five layers run top-down. This section drills into the top layer, data processing — the five steps below — which sets the input quality for every later model.",
+          },
+          file: "tech-roadmap.png",
+          caption: { zh: "总体技术路线（五层）", en: "Overall technical roadmap (five layers)" },
+        },
         steps: [
           { title: { zh: "多源数据采集", en: "Multi-source Acquisition" }, desc: { zh: "CMEMS 与航次数据，覆盖流速、流向、温盐、波浪、地形", en: "CMEMS and voyage data: currents, direction, temperature, salinity, waves, terrain" } },
           { title: { zh: "格式统一", en: "Format Unification" }, desc: { zh: "NetCDF / HDF5 / MAT / TXT 统一为 NetCDF（.nc）", en: "Unify NetCDF/HDF5/MAT/TXT into NetCDF (.nc)" } },
@@ -478,11 +495,36 @@ const SITE_DATA = {
           { title: { zh: "栅格化与标准化", en: "Rasterization" }, desc: { zh: "经纬度转栅格坐标，空间标准化、坐标系统一", en: "Convert coordinates to a raster with unified spatial standards" } },
           { title: { zh: "多维风险矩阵", en: "Risk Matrix" }, desc: { zh: "各变量归一化加权求和，划分风险等级", en: "Normalize and weight variables to grade risk levels" } },
         ],
-        figures: [
-          { file: "tech-roadmap.png", caption: { zh: "总体技术路线", en: "Overall technical roadmap" } },
-          { file: "data-preprocess-flow.png", caption: { zh: "数据集预处理流程", en: "Dataset preprocessing workflow" } },
-          { file: "data-source.png", caption: { zh: "多源海洋数据获取", en: "Multi-source ocean data acquisition" } },
-          { file: "bilinear-interp.png", caption: { zh: "双线性插补缺失值", en: "Bilinear interpolation of missing values" } },
+        /* 每一步对应的图：step 标签标出它在流程里的位置 */
+        detailsLabel: { zh: "分步图示（按流程顺序）", en: "Step-by-step figures (in pipeline order)" },
+        details: [
+          {
+            step: { zh: "步骤 1", en: "Step 1" },
+            file: "data-source.png",
+            caption: { zh: "多源海洋数据获取", en: "Multi-source ocean data acquisition" },
+            note: {
+              zh: "流速、流向、温度、盐度取自 CMEMS 再分析产品，波浪高度与周期单独取用，再与航次实测资料一起汇入——对应总体路线里的基础数据、特征数据与航次数据三类输入。",
+              en: "Current speed/direction, temperature and salinity come from CMEMS reanalysis products; wave height and period are taken separately and merged with voyage measurements — the three input classes in the roadmap.",
+            },
+          },
+          {
+            step: { zh: "步骤 2–3", en: "Step 2–3" },
+            file: "data-preprocess-flow.png",
+            caption: { zh: "数据集预处理流程", en: "Dataset preprocessing workflow" },
+            note: {
+              zh: "三段串行：先把 NetCDF / HDF5 / MAT / TXT 统一成 .nc；再把不同来源的精度与坐标统一到 5′ 基本单元；最后补齐缺失与异常值，产出可直接读取的数据集。",
+              en: "Three serial stages: unify NetCDF/HDF5/MAT/TXT into .nc; align resolution and coordinates of all sources onto a 5′ base unit; then fill missing and abnormal values to produce a readable dataset.",
+            },
+          },
+          {
+            step: { zh: "步骤 3", en: "Step 3" },
+            file: "bilinear-interp.png",
+            caption: { zh: "双线性插补缺失值", en: "Bilinear interpolation of missing values" },
+            note: {
+              zh: "缺失点 f(x, y) 取四周四个已知网格点，先沿经度方向线性插值、再沿纬度方向插值；零散空缺与异常值都由这一步补上，卫星遥感数据的局部空洞不会带进风险矩阵。",
+              en: "For a missing point f(x, y), the four surrounding known grid points are interpolated along longitude and then latitude; scattered gaps and outliers are filled here so satellite-data holes never reach the risk matrix.",
+            },
+          },
         ],
       },
 
@@ -503,31 +545,59 @@ const SITE_DATA = {
           { label: { zh: "风险控制能力", en: "Risk Control" }, scores: { tsa: 1.0, dqn: 0.749, aco: 0.349 } },
           { label: { zh: "综合表现", en: "Overall Performance" }, scores: { tsa: 1.0, dqn: 0.732, aco: 0.342 } },
         ],
-        figure: { file: "algo-score.png", caption: { zh: "各算法得分综合对比（原始图）", en: "Comprehensive score comparison (original chart)" } },
+        figures: [
+          { file: "algo-score.png", caption: { zh: "各算法得分综合对比（原始图）", en: "Comprehensive score comparison (original chart)" } },
+          { file: "aco-flowchart.jpg", caption: { zh: "对比基线：蚁群算法流程", en: "Baseline: ant-colony optimization flow" } },
+        ],
       },
 
-      /* ---- TSA* 算法设计（两阶段 + 机制 + 配图）---- */
+      /* ---- TSA* 算法设计（两阶段 + 机制 + 主流程图 + 支撑图）---- */
       algorithm: {
         stages: [
           {
             title: { zh: "第一阶段 · 二维平面寻优", en: "Stage 1 · 2D Plane Optimization" },
             desc: { zh: "将三维环境投影到二维平面，在四邻域上以综合风险与总代价搜索最优二维路径，快速确定 X、Y 坐标，规避高维搜索的计算爆炸。", en: "Project the 3D environment onto a 2D plane and search the optimal path over four-neighborhood nodes using risk and total cost, quickly fixing X/Y coordinates while avoiding the computational explosion of high-dimensional search." },
+            io: { zh: "输入 3D 风险矩阵 → 输出 XY 平面路径", en: "In: 3D risk matrix → Out: XY plane path" },
           },
           {
             title: { zh: "第二阶段 · 垂直高度优化", en: "Stage 2 · Vertical Height Optimization" },
             desc: { zh: "为每个二维路径点在 0–50 米范围内按步长取样，在满足距离约束与渐进性条件下选取代价最低的高度，生成完整三维路径。", en: "For each 2D waypoint, sample heights within 0–50 m and select the lowest-cost height under distance and continuity constraints, producing the full 3D path." },
+            io: { zh: "输入 XY 路径 → 输出 XYZ 三维路径", en: "In: XY path → Out: XYZ 3D path" },
           },
         ],
         mechanisms: [
-          { zh: "<strong>动态风险适应</strong>：节点扩展时依据当前航速与环境实时更新风险，在高风险区限制航速，权衡速度与安全。", en: "<strong>Dynamic risk adaptation</strong>: update risk at each node expansion based on current speed and environment, limiting speed in high-risk areas to balance speed and safety." },
-          { zh: "<strong>静态风险规避</strong>：在搜索中避开海底地形、礁石、沉船等固定风险因素。", en: "<strong>Static risk avoidance</strong>: steer clear of fixed factors such as terrain, reefs and wrecks during search." },
-          { zh: "<strong>三次 B 样条平滑</strong>：对拐点做控制点平滑，保证路径连续、可操作，避免穿过限制区域。", en: "<strong>Cubic B-spline smoothing</strong>: smooth corners via control points for a continuous, feasible path without crossing restricted areas." },
+          {
+            title: { zh: "动态风险适应", en: "Dynamic risk adaptation" },
+            desc: { zh: "节点扩展时依据当前航速与环境实时更新风险，在高风险区限制航速，权衡速度与安全。", en: "Risk is updated at each node expansion from current speed and environment; speed is capped in high-risk areas to balance speed against safety." },
+          },
+          {
+            title: { zh: "静态风险规避", en: "Static risk avoidance" },
+            desc: { zh: "在搜索中避开海底地形、礁石、沉船等固定风险因素。", en: "The search steers clear of fixed risk factors such as seabed terrain, reefs and wrecks." },
+          },
+          {
+            title: { zh: "三次 B 样条平滑", en: "Cubic B-spline smoothing" },
+            desc: { zh: "对拐点做控制点平滑，保证路径连续、可操作，避免穿过限制区域。", en: "Corners are smoothed with control points so the path stays continuous and feasible without crossing restricted areas." },
+          },
         ],
-        figures: [
-          { file: "tsa-flowchart.jpg", caption: { zh: "TSA* 算法流程", en: "TSA* algorithm flowchart" } },
-          { file: "grid-directions.png", caption: { zh: "栅格方向划分（2D 八方向 / 3D 二十六方向）", en: "Grid directions (8 in 2D / 26 in 3D)" } },
-          { file: "corner-smoothing.png", caption: { zh: "拐点平滑示意", en: "Corner smoothing" } },
-          { file: "aco-flowchart.jpg", caption: { zh: "对比：蚁群优化流程", en: "Baseline: ant-colony optimization flow" } },
+        lead: {
+          file: "tsa-flowchart.jpg",
+          caption: { zh: "TSA* 算法主流程", en: "TSA* main flowchart" },
+          note: { zh: "左侧两个阶段在流程图中的位置：上半段完成二维寻优，下半段完成高度赋值与平滑输出。", en: "Where the two stages sit in the flowchart: the upper half does 2D optimization, the lower half assigns heights and smooths the output." },
+        },
+        supportsLabel: { zh: "机制支撑图", en: "Figures behind the mechanisms" },
+        supports: [
+          {
+            tag: { zh: "支撑第一阶段", en: "Supports stage 1" },
+            file: "grid-directions.png",
+            caption: { zh: "栅格方向划分（2D 八方向 / 3D 二十六方向）", en: "Grid directions (8 in 2D / 26 in 3D)" },
+            note: { zh: "二维寻优按 8 邻域扩展，落格后每点再在高度上取 26 邻域。", en: "2D search expands over 8 neighbours; after snapping, each point samples 26 neighbours in height." },
+          },
+          {
+            tag: { zh: "支撑路径后处理", en: "Supports post-processing" },
+            file: "corner-smoothing.png",
+            caption: { zh: "拐点平滑示意", en: "Corner smoothing" },
+            note: { zh: "（a）单拐点、（b）双拐点：用控制点把折线拐角替换为顺滑弧段。", en: "(a) single corner, (b) double corner: control points replace sharp corners with smooth arcs." },
+          },
         ],
       },
 
@@ -535,6 +605,7 @@ const SITE_DATA = {
         {
           key: "data-result",
           label: { zh: "数据处理结果", en: "Data Processing Results" },
+          cols: 2,
           images: [
             { file: "current-interp.png", caption: { zh: "海流数据插补结果", en: "Current data interpolation result" } },
             { file: "temp-interp.png", caption: { zh: "温度数据插补结果", en: "Temperature data interpolation result" } },
@@ -543,6 +614,7 @@ const SITE_DATA = {
         {
           key: "risk",
           label: { zh: "风险评估", en: "Risk Assessment" },
+          cols: 2,
           images: [
             { file: "risk-result.png", caption: { zh: "风险评估结果（示例）", en: "Risk assessment result (example)" } },
             { file: "risk-zoning-3d.png", caption: { zh: "综合风险三维区划", en: "3D comprehensive risk zoning" } },
@@ -551,19 +623,21 @@ const SITE_DATA = {
         {
           key: "paths",
           label: { zh: "路径规划结果（示例 1 · 同一海域三算法对比）", en: "Path Planning Results (Case 1: three algorithms, same area)" },
-          cols: 3,
+          cols: 2,
+          pair: true,
           images: [
             { file: "path-2d.png", caption: { zh: "TSA*｜二维路径", en: "TSA* | 2D path" } },
-            { file: "dqn-path-2d.png", caption: { zh: "DQN｜二维路径", en: "DQN | 2D path" } },
-            { file: "aco-path-2d.png", caption: { zh: "蚁群算法｜二维路径", en: "ACO | 2D path" } },
             { file: "path-3d.png", caption: { zh: "TSA*｜三维路径", en: "TSA* | 3D path" } },
+            { file: "dqn-path-2d.png", caption: { zh: "DQN｜二维路径", en: "DQN | 2D path" } },
             { file: "dqn-path-3d.png", caption: { zh: "DQN｜三维路径", en: "DQN | 3D path" } },
+            { file: "aco-path-2d.png", caption: { zh: "蚁群算法｜二维路径", en: "ACO | 2D path" } },
             { file: "aco-path-3d.png", caption: { zh: "蚁群算法｜三维路径", en: "ACO | 3D path" } },
           ],
         },
         {
           key: "platform",
           label: { zh: "仿真平台界面", en: "Simulation Platform UI" },
+          cols: 2,
           images: [
             { file: "platform-main.png", caption: { zh: "路径规划主界面", en: "Path planning main interface" } },
             { file: "platform-data.png", caption: { zh: "数据预处理界面", en: "Data preprocessing interface" } },
