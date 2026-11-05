@@ -157,7 +157,7 @@ function buildAboutSection() {
   const head = h("div", "section-head");
   head.append(
     h("h2", "", zh ? "关于我" : "About"),
-    h("p", "", zh ? "教育背景、技术栈与荣誉" : "Education, skills and honors")
+    h("p", "", zh ? "教育背景、技术栈、专利与荣誉" : "Education, skills, patents and honors")
   );
   box.appendChild(head);
 
@@ -199,6 +199,20 @@ function buildAboutSection() {
       groups.appendChild(group);
     });
     block.appendChild(groups);
+    box.appendChild(block);
+  }
+
+  /* 专利 */
+  if (owner.patents && owner.patents.length) {
+    const block = h("div", "about-block");
+    block.appendChild(h("h3", "about-title", zh ? "专利" : "Patents"));
+    const list = h("div", "patent-list");
+    owner.patents.forEach((pt, i) => {
+      const item = h("div", "patent-item");
+      item.append(h("span", "patent-no", String(i + 1).padStart(2, "0")), h("p", "patent-title", t(pt.title)));
+      list.appendChild(item);
+    });
+    block.appendChild(list);
     box.appendChild(block);
   }
 

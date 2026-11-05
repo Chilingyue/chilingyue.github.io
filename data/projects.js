@@ -63,6 +63,22 @@ const SITE_DATA = {
       },
     ],
 
+    /* ---- 专利 ---- */
+    patents: [
+      {
+        title: {
+          zh: "一种基于飞行充电无人机的边缘计算服务续航方法及系统",
+          en: "Method and System for Sustaining Edge Computing Services via Flying-Charging UAVs",
+        },
+      },
+      {
+        title: {
+          zh: "一种基于野马群体觅食机制的多无人机数据采集方法及系统",
+          en: "Method and System for Multi-UAV Data Collection Based on Wild-Horse Herd Foraging Mechanism",
+        },
+      },
+    ],
+
     /* ---- 获奖与荣誉 ---- */
     awards: [
       { category: { zh: "竞赛", en: "Contest" }, title: { zh: "蓝桥杯 C++ 江苏省二等奖", en: "Blue Bridge Cup C++ — 2nd Prize, Jiangsu" } },

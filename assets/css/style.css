@@ -187,6 +187,23 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--primary-soft); padding: 2px 8px; border-radius: 11px;
 }
 
+/* ---------- 关于我：专利 ---------- */
+.patent-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+.patent-item {
+  display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.patent-no {
+  flex: none; margin-top: 2px;
+  font-size: 12px; font-weight: 700; color: var(--primary);
+  background: var(--primary-soft); border-radius: 999px; padding: 2px 9px;
+}
+.patent-title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 14px; line-height: 1.7; color: var(--text); font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
 /* ---------- 项目卡片网格 ---------- */
 .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 26px; }
 .project-card {
