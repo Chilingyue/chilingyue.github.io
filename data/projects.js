@@ -10,8 +10,8 @@ const SITE_DATA = {
   owner: {
     name: { zh: "池凌越", en: "Chilingyue" },
     role: {
-      zh: "南京邮电大学 · 计算机技术专业硕士在读",
-      en: "M.Sc. candidate in Computer Technology, Nanjing University of Posts and Telecommunications",
+      zh: "南京邮电大学 · 计算机技术专业 · 研二在读",
+      en: "Second-year M.Sc. student in Computer Technology, Nanjing University of Posts and Telecommunications",
     },
     bio: {
       zh: "研究方向为无人机路径规划与边缘调度。关注动态环境下的三维路径规划、多无人机协同数据采集与轨迹优化，以及面向无人机通信的深度强化学习轨迹与无线服务联合规划；近期工作涉及海洋环境无人平台的动态风险评估与多目标路径规划。",
