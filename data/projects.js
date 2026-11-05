@@ -550,12 +550,15 @@ const SITE_DATA = {
         },
         {
           key: "paths",
-          label: { zh: "路径规划结果", en: "Path Planning Results" },
+          label: { zh: "路径规划结果（示例 1 · 同一海域三算法对比）", en: "Path Planning Results (Case 1: three algorithms, same area)" },
+          cols: 3,
           images: [
-            { file: "path-2d.png", caption: { zh: "TSA* 二维路径", en: "TSA* 2D path" } },
-            { file: "path-3d.png", caption: { zh: "TSA* 三维路径", en: "TSA* 3D path" } },
-            { file: "dqn-path-2d.png", caption: { zh: "DQN 二维路径", en: "DQN 2D path" } },
-            { file: "aco-path-2d.png", caption: { zh: "蚁群二维路径", en: "ACO 2D path" } },
+            { file: "path-2d.png", caption: { zh: "TSA*｜二维路径", en: "TSA* | 2D path" } },
+            { file: "dqn-path-2d.png", caption: { zh: "DQN｜二维路径", en: "DQN | 2D path" } },
+            { file: "aco-path-2d.png", caption: { zh: "蚁群算法｜二维路径", en: "ACO | 2D path" } },
+            { file: "path-3d.png", caption: { zh: "TSA*｜三维路径", en: "TSA* | 3D path" } },
+            { file: "dqn-path-3d.png", caption: { zh: "DQN｜三维路径", en: "DQN | 3D path" } },
+            { file: "aco-path-3d.png", caption: { zh: "蚁群算法｜三维路径", en: "ACO | 3D path" } },
           ],
         },
         {

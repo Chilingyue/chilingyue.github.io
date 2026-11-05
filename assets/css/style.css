@@ -312,14 +312,27 @@ button { font-family: inherit; cursor: pointer; }
 .gallery-group { margin-bottom: 38px; }
 .gallery-group > h3 { font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 .gallery-group > h3::before { content: ""; width: 5px; height: 20px; border-radius: 3px; background: var(--primary); }
-.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+/* 固定列数（如三算法 × 二/三维的结果对比矩阵）：图不裁切，按原始比例铺满 */
+.gallery-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gallery-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gallery-grid[class*="cols-"] { align-items: start; }
+.gallery-grid[class*="cols-"] .thumb-wrap { aspect-ratio: auto; background: transparent; }
+.gallery-grid[class*="cols-"] .gallery-cell img { height: auto; object-fit: contain; }
 .gallery-cell {
   border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--border);
   background: var(--card); cursor: zoom-in;
 }
-.gallery-cell .thumb-wrap { aspect-ratio: 4 / 3; overflow: hidden; background: var(--bg-soft); }
-.gallery-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.gallery-cell .thumb-wrap { aspect-ratio: 16 / 10; overflow: hidden; background: var(--bg-soft); }
+.gallery-cell img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s; }
 .gallery-cell:hover img { transform: scale(1.06); }
+@media (max-width: 1040px) {
+  .gallery-grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .gallery-grid.cols-2,
+  .gallery-grid.cols-3 { grid-template-columns: minmax(0, 1fr); }
+}
 .gallery-cell figcaption { padding: 9px 12px; font-size: 13px; color: var(--text-2); }
 
 /* ---------- 灯箱 ---------- */

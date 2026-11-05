@@ -438,6 +438,10 @@ function renderDetail(projectId) {
     const g = h("div", "gallery-group");
     g.appendChild(h("h3", "", t(group.label)));
     const grid = h("div", "gallery-grid");
+    if (group.cols) {
+      grid.classList.add("cols-" + group.cols);
+      grid.style.setProperty("--gcols", group.cols);
+    }
     const slides = group.images.map((im) => ({
       src: imgPath(p, im.file),
       caption: t(im.caption),
