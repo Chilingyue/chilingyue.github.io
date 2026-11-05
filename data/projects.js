@@ -469,61 +469,103 @@ const SITE_DATA = {
         },
       ],
 
-      /* ---- 数据处理管线（总览 + 步骤 + 分步配图）---- */
-      pipeline: {
-        overview: {
-          title: { zh: "这条数据管线在整体技术路线中的位置", en: "Where this data pipeline sits in the roadmap" },
-          layers: [
-            { zh: "数据处理", en: "Data processing", here: true },
-            { zh: "机理分析", en: "Mechanism analysis" },
-            { zh: "风险评估", en: "Risk assessment" },
-            { zh: "算法设计", en: "Algorithm design" },
-            { zh: "试验验证", en: "Validation" },
-          ],
-          hereLabel: { zh: "本节", en: "here" },
-          note: {
-            zh: "五层自上而下依次推进。本节展开最上层的「数据处理」，也就是下面的 5 个步骤——它决定了后面所有模型的输入质量。",
-            en: "The five layers run top-down. This section drills into the top layer, data processing — the five steps below — which sets the input quality for every later model.",
+      /* ---- 技术路线：项目整体五层，从数据到验证 ---- */
+      roadmap: {
+        intro: {
+          zh: "整个项目自上而下分五层推进：先把多源海洋数据整理成可计算的风险矩阵，再做机理分析与风险评估，然后进入算法设计，最后在自建仿真平台上验证。这张图是全局，后面每一节的细节都能对回这里。",
+          en: "The project runs top-down in five layers: turn multi-source ocean data into a computable risk matrix, then mechanism analysis and risk assessment, then algorithm design, and finally validation on a self-built simulation platform. This chart is the whole picture that every later section maps back to.",
+        },
+        layers: [
+          {
+            title: { zh: "数据处理", en: "Data Processing" },
+            desc: { zh: "多源数据统一格式、补齐缺失、栅格化，产出多维风险矩阵", en: "Unify, fill and rasterize multi-source data into a multidimensional risk matrix" },
+            section: "pipeline",
           },
-          file: "tech-roadmap.png",
-          caption: { zh: "总体技术路线（五层）", en: "Overall technical roadmap (five layers)" },
+          {
+            title: { zh: "机理分析", en: "Mechanism Analysis" },
+            desc: { zh: "环境特征诊断、风险因子筛选、指标体系构建与指标耦合集成", en: "Environment diagnosis, risk-factor screening, indicator system and coupling" },
+          },
+          {
+            title: { zh: "风险评估", en: "Risk Assessment" },
+            desc: { zh: "安全性、隐蔽性、对抗性三类效能评估，融合为综合风险等级", en: "Safety, stealth and countermeasure assessments fused into an overall risk level" },
+          },
+          {
+            title: { zh: "算法设计", en: "Algorithm Design" },
+            desc: { zh: "两阶段 TSA* 降维搜索，动态风险适应加路径平滑", en: "Two-stage TSA* search with dynamic risk adaptation and path smoothing" },
+            section: "algorithm",
+          },
+          {
+            title: { zh: "试验验证", en: "Validation" },
+            desc: { zh: "自建仿真平台，多场景、多算法对比测试与性能评估", en: "Self-built simulation platform for multi-scenario, multi-algorithm testing" },
+            section: "comparison",
+          },
+        ],
+        linkLabel: { zh: "详见", en: "See" },
+        figure: { file: "tech-roadmap.png", caption: { zh: "总体技术路线（五层）", en: "Overall technical roadmap (five layers)" } },
+      },
+
+      /* ---- 数据处理管线：5 个步骤，每步一张图 ---- */
+      pipeline: {
+        intro: {
+          zh: "数据处理只有 5 步，前一步的产出就是后一步的输入：原始数据 → 统一格式 → 补齐缺失 → 栅格化 → 风险矩阵。下面按顺序展开，每一步配它自己的示意图。",
+          en: "Data processing has exactly five steps, each feeding the next: raw data → unified format → gap filling → rasterization → risk matrix. They are laid out in order below, each with its own figure.",
         },
         steps: [
-          { title: { zh: "多源数据采集", en: "Multi-source Acquisition" }, desc: { zh: "CMEMS 与航次数据，覆盖流速、流向、温盐、波浪、地形", en: "CMEMS and voyage data: currents, direction, temperature, salinity, waves, terrain" } },
-          { title: { zh: "格式统一", en: "Format Unification" }, desc: { zh: "NetCDF / HDF5 / MAT / TXT 统一为 NetCDF（.nc）", en: "Unify NetCDF/HDF5/MAT/TXT into NetCDF (.nc)" } },
-          { title: { zh: "双线性插补", en: "Bilinear Interpolation" }, desc: { zh: "对缺失与异常值插补，提升数据完整性与精度", en: "Fill missing and abnormal values to improve completeness and accuracy" } },
-          { title: { zh: "栅格化与标准化", en: "Rasterization" }, desc: { zh: "经纬度转栅格坐标，空间标准化、坐标系统一", en: "Convert coordinates to a raster with unified spatial standards" } },
-          { title: { zh: "多维风险矩阵", en: "Risk Matrix" }, desc: { zh: "各变量归一化加权求和，划分风险等级", en: "Normalize and weight variables to grade risk levels" } },
-        ],
-        /* 每一步对应的图：step 标签标出它在流程里的位置 */
-        detailsLabel: { zh: "分步图示（按流程顺序）", en: "Step-by-step figures (in pipeline order)" },
-        details: [
           {
-            step: { zh: "步骤 1", en: "Step 1" },
-            file: "data-source.png",
-            caption: { zh: "多源海洋数据获取", en: "Multi-source ocean data acquisition" },
+            title: { zh: "多源数据采集", en: "Multi-source Acquisition" },
+            desc: { zh: "CMEMS 与航次数据，覆盖流速、流向、温盐、波浪、地形", en: "CMEMS and voyage data covering currents, direction, temperature, salinity, waves and terrain" },
+            io: { zh: "输入 CMEMS 再分析产品 + 航次实测 → 输出 基础 / 特征 / 航次三类原始数据集", en: "In: CMEMS reanalysis + voyage measurements → Out: basic / feature / voyage datasets" },
             note: {
-              zh: "流速、流向、温度、盐度取自 CMEMS 再分析产品，波浪高度与周期单独取用，再与航次实测资料一起汇入——对应总体路线里的基础数据、特征数据与航次数据三类输入。",
-              en: "Current speed/direction, temperature and salinity come from CMEMS reanalysis products; wave height and period are taken separately and merged with voyage measurements — the three input classes in the roadmap.",
+              zh: "流速、流向、温度、盐度取自 CMEMS 全球海洋再分析产品，波浪高度与周期单独取用，再与航次实测资料一起汇入，形成三类数据源。",
+              en: "Current speed/direction, temperature and salinity come from CMEMS reanalysis; wave height and period are taken separately and merged with voyage measurements into three data sources.",
             },
+            figures: [{ file: "data-source.png", caption: { zh: "CMEMS 多源海洋数据获取", en: "Multi-source ocean data acquisition from CMEMS" } }],
           },
           {
-            step: { zh: "步骤 2–3", en: "Step 2–3" },
-            file: "data-preprocess-flow.png",
-            caption: { zh: "数据集预处理流程", en: "Dataset preprocessing workflow" },
+            title: { zh: "格式统一", en: "Format Unification" },
+            desc: { zh: "NetCDF / HDF5 / MAT / TXT 统一为 NetCDF（.nc）", en: "Unify NetCDF/HDF5/MAT/TXT into NetCDF (.nc)" },
+            io: { zh: "输入 三类异构原始数据 → 输出 同一格式、同一 5′ 单元的 .nc 数据集", en: "In: three heterogeneous sources → Out: one .nc dataset on a common 5′ grid" },
             note: {
-              zh: "三段串行：先把 NetCDF / HDF5 / MAT / TXT 统一成 .nc；再把不同来源的精度与坐标统一到 5′ 基本单元；最后补齐缺失与异常值，产出可直接读取的数据集。",
-              en: "Three serial stages: unify NetCDF/HDF5/MAT/TXT into .nc; align resolution and coordinates of all sources onto a 5′ base unit; then fill missing and abnormal values to produce a readable dataset.",
+              zh: "三种来源的格式、精度、坐标系都不同。先全部转成 .nc（技术格式统一），再把不同来源的精度与坐标统一到 5′ 基本单元（精度统一），缺失与异常值留给下一步。",
+              en: "The three sources differ in format, resolution and coordinate system. All are converted to .nc first, then resampled onto a common 5′ base unit; gaps and outliers are left to the next step.",
             },
+            figures: [{ file: "data-preprocess-flow.png", caption: { zh: "数据集预处理流程：格式统一 → 精度统一 → 缺失值补齐", en: "Preprocessing: format → resolution → gap filling" } }],
           },
           {
-            step: { zh: "步骤 3", en: "Step 3" },
-            file: "bilinear-interp.png",
-            caption: { zh: "双线性插补缺失值", en: "Bilinear interpolation of missing values" },
+            title: { zh: "双线性插补", en: "Bilinear Interpolation" },
+            desc: { zh: "对缺失与异常值插补，提升数据完整性与精度", en: "Fill missing and abnormal values to improve completeness and accuracy" },
+            io: { zh: "输入 带空缺的 .nc 数据集 → 输出 完整可读的连续数据场", en: "In: .nc dataset with gaps → Out: a complete continuous field" },
             note: {
-              zh: "缺失点 f(x, y) 取四周四个已知网格点，先沿经度方向线性插值、再沿纬度方向插值；零散空缺与异常值都由这一步补上，卫星遥感数据的局部空洞不会带进风险矩阵。",
-              en: "For a missing point f(x, y), the four surrounding known grid points are interpolated along longitude and then latitude; scattered gaps and outliers are filled here so satellite-data holes never reach the risk matrix.",
+              zh: "缺失点 f(x, y) 取四周四个已知网格点，先沿经度方向线性插值、再沿纬度方向加权，得到该点的估计值。左图是插值原理，右图是插补后的海流场——零散空洞被补齐，卫星遥感数据的缺口不会带进风险矩阵。",
+              en: "For a missing point f(x, y), the four surrounding known grid points are interpolated along longitude and then weighted along latitude. Left: the principle; right: the interpolated current field, with scattered gaps filled so satellite-data holes never reach the risk matrix.",
             },
+            figures: [
+              { file: "bilinear-interp.png", caption: { zh: "双线性插补原理（四点加权）", en: "Bilinear interpolation principle" } },
+              { file: "current-interp.png", caption: { zh: "海流数据插补结果", en: "Interpolated current field" } },
+            ],
+          },
+          {
+            title: { zh: "栅格化与标准化", en: "Rasterization" },
+            desc: { zh: "经纬度转栅格坐标，空间标准化、坐标系统一", en: "Convert coordinates to a raster with unified spatial standards" },
+            io: { zh: "输入 连续数据场 → 输出 规则三维栅格（经纬度 × 深度），每格一个风险值", en: "In: continuous field → Out: regular 3D grid indexed by lon/lat/depth" },
+            note: {
+              zh: "把经纬度-深度空间切成规则栅格，每个单元用索引表示，后续搜索都在索引空间里做。栅格方向决定搜索空间：二维按 8 邻域扩展，落到高度维度后每点再取 26 邻域，这也是 TSA* 的搜索空间。",
+              en: "The lon/lat/depth space is cut into a regular grid addressed by indices, and all later search happens in index space. Grid directions define that space: 8 neighbours in 2D, 26 per point once height is added — the search space of TSA*.",
+            },
+            figures: [{ file: "grid-directions.png", caption: { zh: "栅格单元与邻域方向划分（2D 八方向 / 3D 二十六方向）", en: "Grid cells and neighbourhood directions (8 in 2D, 26 in 3D)" } }],
+          },
+          {
+            title: { zh: "多维风险矩阵", en: "Risk Matrix" },
+            desc: { zh: "各变量归一化加权求和，划分风险等级", en: "Normalize and weight variables to grade risk levels" },
+            io: { zh: "输入 多因子栅格 → 输出 三维风险矩阵（按阈值分档）", en: "In: multi-factor grid → Out: 3D risk matrix graded by thresholds" },
+            note: {
+              zh: "流速、温盐、波浪、地形等因子归一化后按权重求和，每个栅格单元得到一个风险值，再按阈值划分等级。下面就是最终的三维风险区划：底部横轴是经纬度、纵轴是深度，颜色从低风险到高风险。",
+              en: "Current, temperature/salinity, wave and terrain factors are normalized and weighted into one risk value per cell, then graded by thresholds. Below: the resulting 3D risk zoning — lon/lat on the base, depth vertical, colour from low to high risk.",
+            },
+            figures: [
+              { file: "risk-matrix.png", caption: { zh: "多维风险矩阵（三维区划）", en: "Multidimensional risk matrix (3D zoning)" } },
+              { file: "risk-result.png", caption: { zh: "风险区划结果（另一海域）", en: "Risk zoning result (another area)" } },
+            ],
           },
         ],
       },
@@ -547,8 +589,19 @@ const SITE_DATA = {
         ],
         figures: [
           { file: "algo-score.png", caption: { zh: "各算法得分综合对比（原始图）", en: "Comprehensive score comparison (original chart)" } },
-          { file: "aco-flowchart.jpg", caption: { zh: "对比基线：蚁群算法流程", en: "Baseline: ant-colony optimization flow" } },
         ],
+        /* 同一海域的路径结果：行 = 算法，列 = 二维 / 三维 */
+        pathsLabel: { zh: "同一海域的路径结果对比", en: "Path results in the same area" },
+        pathsNote: {
+          zh: "同一海域、同一组起终点，三种算法各跑一次：左列只有平面路径，右列是叠加高度后的三维路径。TSA* 绕开高风险区的同时路径更短、转向更少，DQN 与蚁群则出现明显绕行与冗余折返。",
+          en: "Same area, same start and goal, one run per algorithm: the left column is the planar path, the right column the 3D path with height. TSA* avoids high-risk zones with a shorter, cleaner route, while DQN and ACO show visible detours and redundant backtracking.",
+        },
+        paths: [
+          { name: { zh: "TSA*（本项目）", en: "TSA* (ours)" }, highlight: true, file2d: "path-2d.png", file3d: "path-3d.png" },
+          { name: { zh: "DQN", en: "DQN" }, file2d: "dqn-path-2d.png", file3d: "dqn-path-3d.png" },
+          { name: { zh: "蚁群 ACO", en: "ACO" }, file2d: "aco-path-2d.png", file3d: "aco-path-3d.png" },
+        ],
+        pathsCols: { zh: ["二维路径", "三维路径"], en: ["2D path", "3D path"] },
       },
 
       /* ---- TSA* 算法设计（两阶段 + 机制 + 主流程图 + 支撑图）---- */
@@ -587,65 +640,27 @@ const SITE_DATA = {
         supportsLabel: { zh: "机制支撑图", en: "Figures behind the mechanisms" },
         supports: [
           {
-            tag: { zh: "支撑第一阶段", en: "Supports stage 1" },
-            file: "grid-directions.png",
-            caption: { zh: "栅格方向划分（2D 八方向 / 3D 二十六方向）", en: "Grid directions (8 in 2D / 26 in 3D)" },
-            note: { zh: "二维寻优按 8 邻域扩展，落格后每点再在高度上取 26 邻域。", en: "2D search expands over 8 neighbours; after snapping, each point samples 26 neighbours in height." },
-          },
-          {
             tag: { zh: "支撑路径后处理", en: "Supports post-processing" },
             file: "corner-smoothing.png",
             caption: { zh: "拐点平滑示意", en: "Corner smoothing" },
-            note: { zh: "（a）单拐点、（b）双拐点：用控制点把折线拐角替换为顺滑弧段。", en: "(a) single corner, (b) double corner: control points replace sharp corners with smooth arcs." },
+            note: { zh: "（a）单拐点、（b）双拐点：用控制点把折线拐角替换为顺滑弧段，保证路径连续可操作。", en: "(a) single corner, (b) double corner: control points replace sharp corners with smooth arcs so the path stays continuous and trackable." },
           },
         ],
       },
 
-      gallery: [
-        {
-          key: "data-result",
-          label: { zh: "数据处理结果", en: "Data Processing Results" },
-          cols: 2,
-          images: [
-            { file: "current-interp.png", caption: { zh: "海流数据插补结果", en: "Current data interpolation result" } },
-            { file: "temp-interp.png", caption: { zh: "温度数据插补结果", en: "Temperature data interpolation result" } },
-          ],
+      /* ---- 仿真平台：技术路线第五层「试验验证」的落地载体 ---- */
+      platform: {
+        intro: {
+          zh: "技术路线最后一层「试验验证」落在自建的 Python 仿真平台上：数据预处理、风险评估、路径规划、模拟实验四个模块串成一条链路，改权重或换海域就能重跑一组对比实验。下面按链路顺序给出的就是这四步的界面。",
+          en: "The final layer of the roadmap, validation, is carried by a self-built Python simulation platform: data preprocessing, risk assessment, path planning and simulation run as one chain, so reweighting or changing the area re-runs a whole comparison. The four screens below follow that chain.",
         },
-        {
-          key: "risk",
-          label: { zh: "风险评估", en: "Risk Assessment" },
-          cols: 2,
-          images: [
-            { file: "risk-result.png", caption: { zh: "风险评估结果（示例）", en: "Risk assessment result (example)" } },
-            { file: "risk-zoning-3d.png", caption: { zh: "综合风险三维区划", en: "3D comprehensive risk zoning" } },
-          ],
-        },
-        {
-          key: "paths",
-          label: { zh: "路径规划结果（示例 1 · 同一海域三算法对比）", en: "Path Planning Results (Case 1: three algorithms, same area)" },
-          cols: 2,
-          pair: true,
-          images: [
-            { file: "path-2d.png", caption: { zh: "TSA*｜二维路径", en: "TSA* | 2D path" } },
-            { file: "path-3d.png", caption: { zh: "TSA*｜三维路径", en: "TSA* | 3D path" } },
-            { file: "dqn-path-2d.png", caption: { zh: "DQN｜二维路径", en: "DQN | 2D path" } },
-            { file: "dqn-path-3d.png", caption: { zh: "DQN｜三维路径", en: "DQN | 3D path" } },
-            { file: "aco-path-2d.png", caption: { zh: "蚁群算法｜二维路径", en: "ACO | 2D path" } },
-            { file: "aco-path-3d.png", caption: { zh: "蚁群算法｜三维路径", en: "ACO | 3D path" } },
-          ],
-        },
-        {
-          key: "platform",
-          label: { zh: "仿真平台界面", en: "Simulation Platform UI" },
-          cols: 2,
-          images: [
-            { file: "platform-main.png", caption: { zh: "路径规划主界面", en: "Path planning main interface" } },
-            { file: "platform-data.png", caption: { zh: "数据预处理界面", en: "Data preprocessing interface" } },
-            { file: "platform-risk.png", caption: { zh: "安全风险评估界面", en: "Safety risk assessment interface" } },
-            { file: "platform-simulation.png", caption: { zh: "模拟实验界面", en: "Simulation experiment interface" } },
-          ],
-        },
-      ],
+        images: [
+          { file: "platform-data.png", caption: { zh: "① 数据预处理界面", en: "1. Data preprocessing" } },
+          { file: "platform-risk.png", caption: { zh: "② 安全风险评估界面", en: "2. Safety risk assessment" } },
+          { file: "platform-main.png", caption: { zh: "③ 路径规划主界面", en: "3. Path planning" } },
+          { file: "platform-simulation.png", caption: { zh: "④ 模拟实验界面", en: "4. Simulation experiment" } },
+        ],
+      },
 
       reflections: [
         {

@@ -318,6 +318,9 @@ button { font-family: inherit; cursor: pointer; }
 .gallery-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 /* 左宽右窄，让二维宽图与三维方图渲染出同一高度 */
 .gallery-grid.pair-rows { grid-template-columns: 1.85fr 1fr; }
+/* even：平台截图等尺寸不一的图，统一框高，保证四张卡对齐 */
+.gallery-grid.cols-2.even .thumb-wrap { height: 330px; background: var(--card-2); }
+.gallery-grid.cols-2.even .gallery-cell img { height: 100%; object-fit: contain; }
 .gallery-grid[class*="cols-"] { align-items: start; }
 .gallery-grid[class*="cols-"] .thumb-wrap { aspect-ratio: auto; background: transparent; }
 .gallery-grid[class*="cols-"] .gallery-cell img { height: auto; object-fit: contain; }
@@ -462,6 +465,11 @@ button { font-family: inherit; cursor: pointer; }
 @media (hover: hover) and (pointer: fine) {
   body:has(.toc) .container { max-width: min(1092px, calc(100vw - 352px)); }
 }
+/* 窗口很窄时（含桌面缩小窗口）直接收起目录，避免挤占正文 */
+@media (max-width: 700px) {
+  .toc { display: none !important; }
+  body:has(.toc) .container { max-width: min(1092px, calc(100vw - 48px)); }
+}
 
 /* ---------- 响应式 ---------- */
 @media (max-width: 760px) {
@@ -548,146 +556,177 @@ button { font-family: inherit; cursor: pointer; }
   text-align: center;
 }
 
-/* ---------- 数据管线步骤 ---------- */
-.pipeline-steps {
+/* ---------- 技术路线：五层结构 + 总体路线图 ---------- */
+.roadmap-wrap { display: flex; flex-direction: column; gap: 18px; }
+.rm-body {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-}
-.pipeline-step {
-  position: relative;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 18px 16px 16px;
-}
-.pipeline-step::after {
-  content: "→";
-  position: absolute;
-  right: -13px;
-  top: 22px;
-  color: var(--primary);
-  font-size: 16px;
-  z-index: 1;
-}
-.pipeline-step:last-child::after { content: ""; }
-.pipeline-idx {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: var(--primary-contrast);
-  font-weight: 700;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-.pipeline-step h4 { font-size: 15px; margin-bottom: 7px; color: var(--text); }
-.pipeline-step p { font-size: 13px; line-height: 1.65; color: var(--text-2); }
-
-/* ---------- 管线总览（说明 + 技术路线图） ---------- */
-.pipeline-wrap > * + * { margin-top: 20px; }
-.pipe-overview {
-  display: grid;
-  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1fr);
-  gap: 22px;
-  align-items: center;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 24px;
+  align-items: stretch;
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px 22px;
 }
-.pipe-overview-text h4 { font-size: 15.5px; margin-bottom: 14px; color: var(--text); }
-.pipe-overview-text .layer-note { font-size: 13px; line-height: 1.75; color: var(--text-3); margin-top: 14px; }
-/* 五层结构：当前展开的一层高亮 */
-.layer-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.layer-item {
+.rm-layers {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rm-layer {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  border-radius: 8px;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--card);
   border: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--text-2);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.22s ease, transform 0.22s ease;
 }
-.layer-item .layer-no {
+.rm-layer:hover { border-color: var(--primary); transform: translateX(2px); }
+.rm-no {
   flex: none;
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--text-3);
-  background: var(--bg-soft);
-}
-.layer-item.is-here {
-  background: var(--primary-soft);
-  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
-  color: var(--text);
-  font-weight: 600;
-}
-.layer-item.is-here .layer-no { background: var(--primary); color: #fff; }
-.layer-flag {
-  margin-left: auto;
   font-size: 11px;
   font-weight: 700;
-  color: var(--primary);
-  border: 1px solid color-mix(in srgb, var(--primary) 34%, transparent);
-  border-radius: 999px;
-  padding: 1px 8px;
+  color: #fff;
+  background: color-mix(in srgb, var(--primary) 78%, var(--accent));
 }
-.pipe-overview-fig { background: var(--card); }
-.pipe-overview-fig figcaption { display: none; }
+.rm-text { min-width: 0; }
+.rm-text h4 { font-size: 14.5px; margin-bottom: 4px; color: var(--text); }
+.rm-text p { font-size: 12.5px; line-height: 1.6; color: var(--text-2); }
+.rm-link {
+  margin-left: auto;
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px dashed color-mix(in srgb, var(--primary) 45%, transparent);
+  padding-bottom: 1px;
+}
+.rm-fig { background: var(--card); align-self: center; }
+.rm-fig img { width: 100%; max-height: 560px; object-fit: contain; }
 
-/* ---------- 分步配图（挂在对应步骤上） ---------- */
-.pipe-details { display: flex; flex-direction: column; gap: 14px; }
-.pipe-detail {
+/* ---------- 数据处理管线：5 步纵向导轨 ---------- */
+.pipeline-wrap { display: flex; flex-direction: column; gap: 22px; }
+.pipe-flow { display: flex; flex-direction: column; gap: 18px; }
+.pipe-row {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+.pipe-rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 2px;
+}
+.pipe-rail::before {
+  content: "";
+  position: absolute;
+  top: 34px;
+  bottom: -20px;
+  width: 2px;
+  background: linear-gradient(
+    color-mix(in srgb, var(--primary) 26%, transparent),
+    var(--border)
+  );
+}
+.pipe-row:last-child .pipe-rail::before { display: none; }
+.pipe-no {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--card);
+  border: 2px solid color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+.pipe-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 16px 18px 18px;
 }
-.pipe-detail-head {
+.pipe-head {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed var(--border);
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
-.pipe-step-tag {
-  flex: none;
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.pipe-head h4 { font-size: 16px; color: var(--text); }
+.pipe-desc { font-size: 13px; color: var(--text-3); }
+.pipe-io {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.65;
   color: var(--primary);
   background: var(--primary-soft);
-  border: 1px solid color-mix(in srgb, var(--primary) 26%, transparent);
-  border-radius: 999px;
-  padding: 3px 10px;
+  border: 1px dashed color-mix(in srgb, var(--primary) 30%, transparent);
+  border-radius: 8px;
+  padding: 7px 12px;
+  margin-bottom: 12px;
 }
-.pipe-detail-head h5 { font-size: 15px; color: var(--text); }
-.pipe-detail-body {
+.pipe-note {
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--text-2);
+  max-width: 86ch;
+}
+.pipe-body {
   display: grid;
-  grid-template-columns: minmax(0, 0.66fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 22px;
   align-items: center;
 }
-.pipe-detail-note p { font-size: 13.5px; line-height: 1.8; color: var(--text-2); }
-.pipe-detail-fig { background: transparent; border: 0; padding: 0; }
-.pipe-detail-fig:hover { transform: none; box-shadow: none; border-color: transparent; }
-.pipe-detail-fig img { max-height: 320px; }
-.pipe-detail-fig figcaption { display: none; }
+.pipe-body.stack { grid-template-columns: minmax(0, 1fr); }
+.pipe-figs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.pipe-figs.count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pipe-fig { background: var(--bg-soft); }
+.pipe-fig img { width: 100%; height: 230px; object-fit: contain; }
+
+/* ---------- 路径结果矩阵：行 = 算法，列 = 二维 / 三维 ---------- */
+.path-matrix { display: flex; flex-direction: column; gap: 12px; }
+.pm-head,
+.pm-row {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1.85fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.pm-head {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  padding: 0 2px;
+}
+.pm-head span:not(.pm-corner) { text-align: center; }
+.pm-row { align-items: center; }
+.pm-name { font-size: 13.5px; line-height: 1.5; color: var(--text-2); }
+.pm-row.is-best .pm-name { color: var(--primary); font-weight: 700; }
+.pm-fig { background: var(--bg-soft); }
+.pm-fig img { width: 100%; height: 270px; object-fit: contain; }
+.pm-fig figcaption { font-size: 12px; }
 
 /* ---------- 算法对比条形图 ---------- */
 .comparison-wrap { display: flex; flex-direction: column; gap: 14px; }
+.cmp-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .cmp-group {
   background: var(--card);
   border: 1px solid var(--border);
@@ -848,33 +887,35 @@ button { font-family: inherit; cursor: pointer; }
 .algo-support-fig { background: transparent; border: 0; padding: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .algo-support-fig:hover { transform: none; box-shadow: none; border-color: transparent; }
 .algo-support-fig img { width: 100%; height: 190px; max-height: 190px; object-fit: contain; background: transparent; }
+.algo-supports .algo-support:only-child { grid-column: 1 / -1; max-width: 800px; margin: 0 auto; width: 100%; }
+.algo-support:only-child .algo-support-fig img { height: 240px; max-height: 240px; }
 .algo-support-fig figcaption { display: none; }
 .algo-support-note { font-size: 12.5px; line-height: 1.7; color: var(--text-3); }
 
 /* ---------- 对比区配图（得分图 + 基线流程） ---------- */
-.cmp-figs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.cmp-figs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; justify-items: center; }
+.cmp-figs > .fig-card { width: 100%; max-width: 880px; }
 .cmp-figs.has-side { grid-template-columns: minmax(0, 1fr) 280px; align-items: start; }
 .cmp-figs .fig-card img { max-height: 420px; }
 
 /* ---------- 海洋板块响应式 ---------- */
 @media (max-width: 900px) {
-  .pipeline-steps { grid-template-columns: 1fr; gap: 12px; }
-  .pipeline-step::after {
-    content: "↓";
-    right: 50%;
-    top: auto;
-    bottom: -15px;
-    transform: translateX(50%);
-  }
-  .pipe-overview,
-  .pipe-detail-body,
+  .rm-body,
   .algo-layout,
   .algo-supports,
   .cmp-figs.has-side { grid-template-columns: minmax(0, 1fr); }
+  .pipe-body { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .cmp-groups { grid-template-columns: minmax(0, 1fr); }
+  .pipe-row { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
+  .pipe-rail::before { bottom: -18px; }
   .algo-lead-fig img { max-height: 460px; }
 }
 @media (max-width: 760px) {
   .cmp-row { gap: 10px; }
   .cmp-name { flex-basis: 96px; font-size: 12.5px; }
   .cmp-val { flex-basis: 44px; font-size: 12.5px; }
+  .pipe-figs.count-2 { grid-template-columns: minmax(0, 1fr); }
+  .pm-head { display: none; }
+  .pm-row { grid-template-columns: minmax(0, 1fr); }
+  .pm-name { margin: 4px 0 2px; font-weight: 700; color: var(--text); }
 }

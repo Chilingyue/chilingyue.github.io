@@ -264,9 +264,11 @@ const LABELS = {
   metrics: { zh: "关键指标", en: "Key Metrics" },
   background: { zh: "项目背景", en: "Background" },
   contributions: { zh: "我的工作与贡献", en: "My Contributions" },
-  pipeline: { zh: "技术路线与数据管线", en: "Technical Roadmap & Data Pipeline" },
+  pipeline: { zh: "数据处理管线", en: "Data Pipeline" },
+  roadmap: { zh: "技术路线", en: "Technical Roadmap" },
   comparison: { zh: "算法对比", en: "Algorithm Comparison" },
   algorithm: { zh: "TSA* 算法设计", en: "TSA* Algorithm Design" },
+  platform: { zh: "仿真平台", en: "Simulation Platform" },
   journey: { zh: "探索历程", en: "Journey" },
   goals: { zh: "项目目标", en: "Goals" },
   workflow: { zh: "工作流程", en: "Workflow" },
@@ -337,14 +339,20 @@ function renderDetail(projectId) {
     );
   }
 
-  /* 技术路线与数据管线 */
-  if (p.pipeline) root.appendChild(sectionWrap("pipeline", buildPipeline(p)));
+  /* 技术路线（项目全局五层） */
+  if (p.roadmap) root.appendChild(sectionWrap("roadmap", buildRoadmap(p)));
 
-  /* 算法对比（纯 CSS 条形图）*/
-  if (p.comparison) root.appendChild(sectionWrap("comparison", buildComparison(p)));
+  /* 数据处理管线（5 个步骤） */
+  if (p.pipeline) root.appendChild(sectionWrap("pipeline", buildPipeline(p)));
 
   /* TSA* 算法设计 */
   if (p.algorithm) root.appendChild(sectionWrap("algorithm", buildAlgorithm(p)));
+
+  /* 算法对比（条形图 + 同一海域路径矩阵）*/
+  if (p.comparison) root.appendChild(sectionWrap("comparison", buildComparison(p)));
+
+  /* 仿真平台 */
+  if (p.platform) root.appendChild(sectionWrap("platform", buildPlatform(p)));
 
   /* 目标 */
   if (p.goals) {
@@ -431,33 +439,14 @@ function renderDetail(projectId) {
     root.appendChild(sectionWrap("issues", issueList));
   }
 
-  /* 画廊 */
+  /* 画廊（若项目未把图片并入各章节时使用） */
   if (p.gallery) {
     const galleryWrap = h("div", "");
     p.gallery.forEach((group) => {
-    const g = h("div", "gallery-group");
-    g.appendChild(h("h3", "", t(group.label)));
-    const grid = h("div", "gallery-grid");
-    if (group.cols) grid.classList.add("cols-" + group.cols);
-    if (group.pair) grid.classList.add("pair-rows");
-    const slides = group.images.map((im) => ({
-      src: imgPath(p, im.file),
-      caption: t(im.caption),
-    }));
-    group.images.forEach((im, idx) => {
-      const cell = h("figure", "gallery-cell");
-      const tw = h("div", "thumb-wrap");
-      const img = h("img");
-      img.src = imgPath(p, "thumbs/" + im.file);
-      img.alt = t(im.caption);
-      img.loading = "lazy";
-      tw.appendChild(img);
-      cell.append(tw, h("figcaption", "", t(im.caption)));
-      cell.addEventListener("click", () => openLightbox(slides, idx));
-      grid.appendChild(cell);
-    });
-    g.appendChild(grid);
-    galleryWrap.appendChild(g);
+      const g = h("div", "gallery-group");
+      g.appendChild(h("h3", "", t(group.label)));
+      g.appendChild(buildGalleryGrid(p, group));
+      galleryWrap.appendChild(g);
     });
     root.appendChild(sectionWrap("gallery", galleryWrap));
   }
@@ -540,59 +529,106 @@ function toSlides(p, list) {
   return list.map((f) => ({ src: imgPath(p, f.file), caption: t(f.caption) }));
 }
 
-/* 技术路线与数据管线：五层总览 → 5 步流程 → 每步配图 */
+/* 图片网格（画廊 / 仿真平台共用）：缩略图 + 点击灯箱 */
+function buildGalleryGrid(p, group) {
+  const grid = h(
+    "div",
+    "gallery-grid" +
+      (group.cols ? " cols-" + group.cols : "") +
+      (group.pair ? " pair-rows" : "") +
+      (group.even ? " even" : "")
+  );
+  const slides = group.images.map((im) => ({ src: imgPath(p, im.file), caption: t(im.caption) }));
+  group.images.forEach((im, idx) => {
+    const cell = h("figure", "gallery-cell");
+    const tw = h("div", "thumb-wrap");
+    const img = h("img");
+    img.src = imgPath(p, "thumbs/" + im.file);
+    img.alt = t(im.caption);
+    img.loading = "lazy";
+    tw.appendChild(img);
+    cell.append(tw, h("figcaption", "", t(im.caption)));
+    cell.addEventListener("click", () => openLightbox(slides, idx));
+    grid.appendChild(cell);
+  });
+  return grid;
+}
+
+/* 技术路线：五层结构（可跳转）+ 总体路线图，是全项目的骨架 */
+function buildRoadmap(p) {
+  const wrap = h("div", "roadmap-wrap");
+  const rm = p.roadmap;
+  if (rm.intro) wrap.appendChild(h("p", "cmp-note", t(rm.intro)));
+
+  const body = h("div", "rm-body");
+  const ol = h("ol", "rm-layers");
+  rm.layers.forEach((l, i) => {
+    const li = h("li", "rm-layer");
+    const no = h("span", "rm-no", String(i + 1).padStart(2, "0"));
+    const txt = h("div", "rm-text");
+    txt.append(h("h4", "", t(l.title)), h("p", "", t(l.desc)));
+    li.append(no, txt);
+    if (l.section) {
+      const a = h("a", "rm-link", `${t(rm.linkLabel)} →`);
+      a.href = "#sec-" + l.section;
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const target = document.getElementById("sec-" + l.section);
+        if (target) window.scrollTo({ top: target.offsetTop - 70, behavior: "smooth" });
+      });
+      li.appendChild(a);
+    }
+    ol.appendChild(li);
+  });
+  body.append(ol, figCard(p, rm.figure, toSlides(p, [rm.figure]), 0, "rm-fig"));
+  wrap.appendChild(body);
+  return wrap;
+}
+
+/* 数据处理管线：5 个步骤沿导轨纵向串联，每步配自己的示意图 */
 function buildPipeline(p) {
   const wrap = h("div", "pipeline-wrap");
   const pl = p.pipeline;
+  if (pl.intro) wrap.appendChild(h("p", "cmp-note", t(pl.intro)));
 
-  /* 1) 总览：五层结构 + 技术路线图 */
-  if (pl.overview) {
-    const ov = h("div", "pipe-overview");
-    const txt = h("div", "pipe-overview-text");
-    txt.appendChild(h("h4", "", t(pl.overview.title)));
-    if (pl.overview.layers) {
-      const ol = h("ol", "layer-list");
-      pl.overview.layers.forEach((l, i) => {
-        const li = h("li", "layer-item" + (l.here ? " is-here" : ""));
-        li.append(h("span", "layer-no", String(i + 1)), h("span", "layer-name", t(l)));
-        if (l.here) li.appendChild(h("span", "layer-flag", t(pl.overview.hereLabel)));
-        ol.appendChild(li);
-      });
-      txt.appendChild(ol);
-    }
-    txt.appendChild(h("p", "layer-note", t(pl.overview.note)));
-    ov.append(txt, figCard(p, pl.overview, toSlides(p, [pl.overview]), 0, "pipe-overview-fig"));
-    wrap.appendChild(ov);
-  }
-
-  /* 2) 五步流程 */
-  const steps = h("div", "pipeline-steps");
+  const flow = h("div", "pipe-flow");
   pl.steps.forEach((s, i) => {
-    const card = h("div", "pipeline-step");
-    card.appendChild(h("span", "pipeline-idx", String(i + 1)));
-    card.append(h("h4", "", t(s.title)), h("p", "", t(s.desc)));
-    steps.appendChild(card);
-  });
-  wrap.appendChild(steps);
+    const row = h("div", "pipe-row");
+    const rail = h("div", "pipe-rail");
+    rail.appendChild(h("span", "pipe-no", String(i + 1)));
+    const card = h("div", "pipe-card");
 
-  /* 3) 分步配图：每张图挂在它所属的步骤上 */
-  if (pl.details && pl.details.length) {
-    const slides = toSlides(p, pl.details);
-    if (pl.detailsLabel) wrap.appendChild(h("h4", "block-sub", t(pl.detailsLabel)));
-    const list = h("div", "pipe-details");
-    pl.details.forEach((d, i) => {
-      const item = h("div", "pipe-detail");
-      const head = h("div", "pipe-detail-head");
-      head.append(h("span", "pipe-step-tag", t(d.step)), h("h5", "", t(d.caption)));
-      const body = h("div", "pipe-detail-body");
-      const note = h("div", "pipe-detail-note");
-      note.appendChild(h("p", "", t(d.note)));
-      body.append(note, figCard(p, d, slides, i, "pipe-detail-fig"));
-      item.append(head, body);
-      list.appendChild(item);
-    });
-    wrap.appendChild(list);
-  }
+    const head = h("div", "pipe-head");
+    head.append(h("h4", "", t(s.title)), h("p", "pipe-desc", t(s.desc)));
+    card.appendChild(head);
+
+    const body = h("div", "pipe-body" + (s.figures && s.figures.length > 1 ? " stack" : ""));
+    const txt = h("div", "pipe-text");
+    if (s.io) txt.appendChild(h("p", "pipe-io", t(s.io)));
+    if (s.note) txt.appendChild(h("p", "pipe-note", t(s.note)));
+    body.appendChild(txt);
+
+    if (s.figures && s.figures.length) {
+      const slides = toSlides(p, s.figures);
+      const figs = h("div", "pipe-figs" + (s.figures.length > 1 ? " count-2" : ""));
+      s.figures.forEach((f, k) => figs.appendChild(figCard(p, f, slides, k, "pipe-fig")));
+      body.appendChild(figs);
+    }
+    card.appendChild(body);
+    row.append(rail, card);
+    flow.appendChild(row);
+  });
+  wrap.appendChild(flow);
+  return wrap;
+}
+
+/* 仿真平台：按链路顺序的四张界面图 */
+function buildPlatform(p) {
+  const wrap = h("div", "platform-wrap");
+  if (p.platform.intro) wrap.appendChild(h("p", "cmp-note", t(p.platform.intro)));
+  wrap.appendChild(
+    buildGalleryGrid(p, { cols: 2, even: true, images: p.platform.images })
+  );
   return wrap;
 }
 
@@ -601,6 +637,8 @@ function buildComparison(p) {
   const wrap = h("div", "comparison-wrap");
   const c = p.comparison;
   if (c.note) wrap.appendChild(h("p", "cmp-note", t(c.note)));
+  const groups = h("div", "cmp-groups");
+  wrap.appendChild(groups);
   c.dimensions.forEach((dim) => {
     const group = h("div", "cmp-group");
     group.appendChild(h("h4", "cmp-dim", t(dim.label)));
@@ -616,13 +654,42 @@ function buildComparison(p) {
       row.append(h("span", "cmp-name", t(a.name)), track, h("span", "cmp-val", score.toFixed(3)));
       group.appendChild(row);
     });
-    wrap.appendChild(group);
+    groups.appendChild(group);
   });
   if (c.figures && c.figures.length) {
     const row = h("div", "cmp-figs" + (c.figures.length > 1 ? " has-side" : ""));
     const slides = toSlides(p, c.figures);
     c.figures.forEach((f, i) => row.appendChild(figCard(p, f, slides, i)));
     wrap.appendChild(row);
+  }
+
+  /* 同一海域路径矩阵：行 = 算法，列 = 二维 / 三维 */
+  if (c.paths && c.paths.length) {
+    if (c.pathsLabel) wrap.appendChild(h("h4", "block-sub", t(c.pathsLabel)));
+    if (c.pathsNote) wrap.appendChild(h("p", "cmp-note", t(c.pathsNote)));
+
+    const flat = [];
+    c.paths.forEach((r) => {
+      flat.push({ file: r.file2d, caption: { zh: r.name.zh + "｜二维路径", en: r.name.en + " | 2D path" } });
+      flat.push({ file: r.file3d, caption: { zh: r.name.zh + "｜三维路径", en: r.name.en + " | 3D path" } });
+    });
+    const slides = toSlides(p, flat);
+
+    const matrix = h("div", "path-matrix");
+    const head = h("div", "pm-head");
+    head.appendChild(h("span", "pm-corner", ""));
+    (c.pathsCols[state.lang] || c.pathsCols.zh).forEach((col) => head.appendChild(h("span", "", col)));
+    matrix.appendChild(head);
+
+    let idx = 0;
+    c.paths.forEach((r) => {
+      const row = h("div", "pm-row" + (r.highlight ? " is-best" : ""));
+      row.appendChild(h("span", "pm-name", t(r.name)));
+      row.appendChild(figCard(p, flat[idx], slides, idx++, "pm-fig"));
+      row.appendChild(figCard(p, flat[idx], slides, idx++, "pm-fig"));
+      matrix.appendChild(row);
+    });
+    wrap.appendChild(matrix);
   }
   return wrap;
 }
