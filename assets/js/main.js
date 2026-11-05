@@ -699,43 +699,55 @@ function buildAlgorithm(p) {
   const wrap = h("div", "algorithm-wrap");
   const a = p.algorithm;
 
-  const layout = h("div", "algo-layout");
-  const left = h("div", "algo-left");
-
-  const flow = h("div", "algo-flow");
+  /* 1) 两阶段：先说清各自的作用与衔接 */
+  const stages = h("div", "algo-stages");
   a.stages.forEach((s, i) => {
     const stage = h("div", "algo-stage");
     const head = h("div", "algo-stage-head");
     head.append(h("span", "algo-stage-no", String(i + 1)), h("h4", "", t(s.title)));
     stage.append(head, h("p", "", t(s.desc)));
     if (s.io) stage.appendChild(h("p", "algo-stage-io", t(s.io)));
-    flow.appendChild(stage);
-    if (i < a.stages.length - 1) flow.appendChild(h("div", "algo-flow-arrow", "↓"));
+    stages.appendChild(stage);
+    if (i < a.stages.length - 1) stages.appendChild(h("div", "algo-stage-arrow", "→"));
   });
-  left.appendChild(flow);
+  wrap.appendChild(stages);
 
-  const mech = h("ul", "algo-mech");
-  a.mechanisms.forEach((m) => {
-    const li = h("li", "");
-    li.append(h("strong", "", t(m.title)), h("span", "", t(m.desc)));
-    mech.appendChild(li);
-  });
-  left.appendChild(mech);
-  layout.appendChild(left);
-
+  /* 2) 主流程：一张图 + 右侧读图指引（两个阶段落在流程图的哪一段）*/
   if (a.lead) {
-    const lead = h("div", "algo-lead");
-    lead.append(
-      figCard(p, a.lead, toSlides(p, [a.lead]), 0, "algo-lead-fig"),
-      h("p", "algo-lead-note", t(a.lead.note))
-    );
-    layout.appendChild(lead);
+    const main = h("div", "algo-main");
+    const figSide = h("div", "algo-main-fig");
+    figSide.appendChild(figCard(p, a.lead, toSlides(p, [a.lead]), 0, "algo-main-card"));
+
+    const side = h("div", "algo-main-side");
+    if (a.lead.stepsLabel) side.appendChild(h("h5", "algo-main-title", t(a.lead.stepsLabel)));
+    if (a.lead.steps) {
+      const list = h("div", "algo-main-steps");
+      a.lead.steps.forEach((s) => {
+        const item = h("div", "algo-main-step");
+        item.append(h("span", "algo-main-step-tag", t(s.tag)), h("p", "", t(s.text)));
+        list.appendChild(item);
+      });
+      side.appendChild(list);
+    }
+    main.append(figSide, side);
+    wrap.appendChild(main);
   }
-  wrap.appendChild(layout);
+
+  /* 3) 细节技术支撑：三条机制 + 支撑图 */
+  if (a.supportsLabel) wrap.appendChild(h("h4", "block-sub", t(a.supportsLabel)));
+
+  if (a.mechanisms) {
+    const grid = h("div", "algo-mech-grid");
+    a.mechanisms.forEach((m, i) => {
+      const card = h("div", "algo-mech-card");
+      card.append(h("span", "algo-mech-no", String(i + 1)), h("strong", "", t(m.title)), h("p", "", t(m.desc)));
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+  }
 
   if (a.supports && a.supports.length) {
     const slides = toSlides(p, a.supports);
-    if (a.supportsLabel) wrap.appendChild(h("h4", "block-sub", t(a.supportsLabel)));
     const sup = h("div", "algo-supports");
     a.supports.forEach((s, i) => {
       const card = h("div", "algo-support");

@@ -789,23 +789,21 @@ button { font-family: inherit; cursor: pointer; }
 .cmp-row.is-best .cmp-val { color: var(--primary); font-weight: 700; }
 @keyframes cmp-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* ---------- TSA* 算法设计：左侧两阶段流程 + 右侧主流程图 ---------- */
-.algo-layout {
+/* ---------- TSA* 算法设计：两阶段说明 → 主流程 → 细节支撑（纵向三段） ---------- */
+.algo-stages {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  gap: 22px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 10px;
 }
-.algo-left { display: flex; flex-direction: column; gap: 18px; }
-.algo-flow { display: flex; flex-direction: column; align-items: stretch; }
 .algo-stage {
   background: var(--card);
   border: 1px solid var(--border);
   border-left: 4px solid var(--accent);
   border-radius: var(--radius-sm);
-  padding: 16px 18px;
+  padding: 18px 20px;
 }
-.algo-stage-head { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.algo-stage-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .algo-stage-no {
   flex: none;
   display: inline-flex;
@@ -819,43 +817,106 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 12.5px;
   font-weight: 700;
 }
-.algo-stage-head h4 { font-size: 15px; color: var(--text); }
+.algo-stage-head h4 { font-size: 15.5px; color: var(--text); }
 .algo-stage p { font-size: 13.5px; line-height: 1.78; color: var(--text-2); }
 .algo-stage-io {
-  margin-top: 10px;
-  padding-top: 9px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px dashed var(--border);
   font-size: 12.5px !important;
   color: var(--text-3) !important;
   letter-spacing: 0.01em;
 }
-.algo-flow-arrow {
+.algo-stage-arrow {
   align-self: center;
-  color: var(--primary);
-  font-size: 18px;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: #fff;
+  font-size: 13px;
   line-height: 1;
-  margin: 3px 0;
 }
-/* 三条关键机制：标题一行、说明一段 */
-.algo-mech { list-style: none; display: grid; gap: 10px; }
-.algo-mech li {
+
+/* 主流程：左图右读图指引 */
+.algo-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  margin-top: 20px;
+  padding: 22px 26px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.algo-main-fig { display: flex; justify-content: center; }
+.algo-main-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 12px 16px;
+  padding: 10px;
+  width: 100%;
+  max-width: 520px;
 }
-.algo-mech li strong {
-  display: block;
-  font-size: 14px;
-  color: var(--text);
-  margin-bottom: 5px;
+.algo-main-card img { width: 100%; max-height: 660px; object-fit: contain; }
+.algo-main-card figcaption { font-size: 12.5px; }
+.algo-main-side { display: flex; flex-direction: column; gap: 12px; }
+.algo-main-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.algo-main-steps { display: flex; flex-direction: column; gap: 18px; }
+.algo-main-step {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
 }
-.algo-mech li span { font-size: 13px; line-height: 1.72; color: var(--text-2); }
-.algo-lead { display: flex; flex-direction: column; gap: 10px; }
-.algo-lead-fig { background: var(--card); }
-.algo-lead-fig img { max-height: 560px; }
-.algo-lead-note { font-size: 12.5px; line-height: 1.7; color: var(--text-3); text-align: center; }
+.algo-main-step-tag {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 0;
+  text-align: center;
+}
+.algo-main-step p { font-size: 13.5px; line-height: 1.78; color: var(--text-2); }
+
+/* 三条关键机制：三列卡片 */
+.algo-mech-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 4px;
+}
+.algo-mech-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px 16px;
+}
+.algo-mech-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.algo-mech-card strong { display: block; font-size: 14px; color: var(--text); margin-bottom: 6px; }
+.algo-mech-card p { font-size: 13px; line-height: 1.72; color: var(--text-2); }
 
 /* ---------- 支撑图（标明支撑哪个阶段） ---------- */
 .algo-supports {
@@ -887,8 +948,8 @@ button { font-family: inherit; cursor: pointer; }
 .algo-support-fig { background: transparent; border: 0; padding: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .algo-support-fig:hover { transform: none; box-shadow: none; border-color: transparent; }
 .algo-support-fig img { width: 100%; height: 190px; max-height: 190px; object-fit: contain; background: transparent; }
-.algo-supports .algo-support:only-child { grid-column: 1 / -1; max-width: 800px; margin: 0 auto; width: 100%; }
-.algo-support:only-child .algo-support-fig img { height: 240px; max-height: 240px; }
+.algo-supports .algo-support:only-child { grid-column: 1 / -1; max-width: 880px; margin: 0 auto; width: 100%; }
+.algo-support:only-child .algo-support-fig img { height: 300px; max-height: 300px; }
 .algo-support-fig figcaption { display: none; }
 .algo-support-note { font-size: 12.5px; line-height: 1.7; color: var(--text-3); }
 
@@ -899,21 +960,33 @@ button { font-family: inherit; cursor: pointer; }
 .cmp-figs .fig-card img { max-height: 420px; }
 
 /* ---------- 海洋板块响应式 ---------- */
+/* 平板及以下：主流程改为上图下文，避免图被压小、说明挤成窄条 */
+@media (max-width: 1080px) {
+  .algo-main { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 18px; }
+  .algo-main-card { width: auto; max-width: 100%; margin: 0 auto; }
+  .algo-main-card img { width: auto; max-width: 100%; max-height: 520px; }
+}
 @media (max-width: 900px) {
   .rm-body,
-  .algo-layout,
+  .algo-main,
+  .algo-mech-grid,
   .algo-supports,
   .cmp-figs.has-side { grid-template-columns: minmax(0, 1fr); }
+  .algo-stages { grid-template-columns: minmax(0, 1fr); }
+  .algo-stage-arrow { transform: rotate(90deg); justify-self: center; }
+  .algo-main { padding: 16px; gap: 16px; }
+  .algo-main-card img { max-height: 460px; }
   .pipe-body { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .cmp-groups { grid-template-columns: minmax(0, 1fr); }
   .pipe-row { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; }
   .pipe-rail::before { bottom: -18px; }
-  .algo-lead-fig img { max-height: 460px; }
 }
 @media (max-width: 760px) {
   .cmp-row { gap: 10px; }
   .cmp-name { flex-basis: 96px; font-size: 12.5px; }
   .cmp-val { flex-basis: 44px; font-size: 12.5px; }
+  .algo-main-step { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .algo-main-step-tag { justify-self: flex-start; padding: 3px 10px; }
   .pipe-figs.count-2 { grid-template-columns: minmax(0, 1fr); }
   .pm-head { display: none; }
   .pm-row { grid-template-columns: minmax(0, 1fr); }

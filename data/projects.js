@@ -609,12 +609,12 @@ const SITE_DATA = {
         stages: [
           {
             title: { zh: "第一阶段 · 二维平面寻优", en: "Stage 1 · 2D Plane Optimization" },
-            desc: { zh: "将三维环境投影到二维平面，在四邻域上以综合风险与总代价搜索最优二维路径，快速确定 X、Y 坐标，规避高维搜索的计算爆炸。", en: "Project the 3D environment onto a 2D plane and search the optimal path over four-neighborhood nodes using risk and total cost, quickly fixing X/Y coordinates while avoiding the computational explosion of high-dimensional search." },
+            desc: { zh: "把三维环境投影成二维平面，只在平面内搜路：按综合风险和总代价逐节点扩展，先把 X、Y 坐标定下来，绕开三维直接搜索的计算爆炸。", en: "Project the 3D environment onto a plane and search in-plane only: expand node by node on combined risk and total cost, fixing X/Y first and avoiding the computational explosion of a full 3D search." },
             io: { zh: "输入 3D 风险矩阵 → 输出 XY 平面路径", en: "In: 3D risk matrix → Out: XY plane path" },
           },
           {
             title: { zh: "第二阶段 · 垂直高度优化", en: "Stage 2 · Vertical Height Optimization" },
-            desc: { zh: "为每个二维路径点在 0–50 米范围内按步长取样，在满足距离约束与渐进性条件下选取代价最低的高度，生成完整三维路径。", en: "For each 2D waypoint, sample heights within 0–50 m and select the lowest-cost height under distance and continuity constraints, producing the full 3D path." },
+            desc: { zh: "平面路径定好后，为每个路径点在 0–50 米内按步长取样，在距离约束与渐进性条件下选代价最低的高度，补上 Z 坐标，得到完整三维路径。", en: "With the planar path fixed, each waypoint samples heights within 0–50 m and takes the lowest-cost one under distance and continuity constraints, adding Z to complete the 3D path." },
             io: { zh: "输入 XY 路径 → 输出 XYZ 三维路径", en: "In: XY path → Out: XYZ 3D path" },
           },
         ],
@@ -635,9 +635,27 @@ const SITE_DATA = {
         lead: {
           file: "tsa-flowchart.jpg",
           caption: { zh: "TSA* 算法主流程", en: "TSA* main flowchart" },
-          note: { zh: "左侧两个阶段在流程图中的位置：上半段完成二维寻优，下半段完成高度赋值与平滑输出。", en: "Where the two stages sit in the flowchart: the upper half does 2D optimization, the lower half assigns heights and smooths the output." },
+          stepsLabel: { zh: "两步在流程图里的位置", en: "Where the two stages sit" },
+          steps: [
+            {
+              tag: { zh: "输入", en: "Input" },
+              text: { zh: "三维栅格地图、起点、终点与 UUV 运动参数，是整条流程的输入。", en: "The 3D grid map, start, goal and UUV motion parameters feed the whole flow." },
+            },
+            {
+              tag: { zh: "初始化", en: "Setup" },
+              text: { zh: "先把三维地图压成二维栅格并初始化搜索参数，为第一阶段的平面寻优做准备。", en: "The 3D map is flattened into a 2D grid and search parameters are initialized, preparing stage 1." },
+            },
+            {
+              tag: { zh: "第一阶段", en: "Stage 1" },
+              text: { zh: "进入循环：计算相邻节点的综合风险与总代价、选择跳转节点；判定未到终点时，按航速与环境更新动态风险，再回到搜索继续扩展。这条回边就是两阶段里的二维寻优主体。", en: "The loop begins: score neighbouring nodes by combined risk and total cost, pick the next hop; if the goal is not reached, risk is refreshed from speed and environment and the search continues. This back-edge is the body of stage 1." },
+            },
+            {
+              tag: { zh: "第二阶段", en: "Stage 2" },
+              text: { zh: "判定到达终点后离开循环，按距离限制与代价约束为平面路径点赋高度，生成三维路径并结束。", en: "Once the goal is reached the loop exits; heights are assigned under distance and cost constraints to produce the 3D path." },
+            },
+          ],
         },
-        supportsLabel: { zh: "机制支撑图", en: "Figures behind the mechanisms" },
+        supportsLabel: { zh: "细节技术支撑", en: "Technical details" },
         supports: [
           {
             tag: { zh: "支撑路径后处理", en: "Supports post-processing" },
