@@ -104,7 +104,7 @@ const SITE_DATA = {
       period: "2023.10 – 2024.10",
       cover: "projects/uav-smart-building/images/scene-closeup.png",
       heroImage: "scene-closeup.png", /* 详情页「项目概览」背景图 */
-      tags: ["Crazyflie", "ROS", "Crazyswarm", "NOKOV", "VRPN", "Python", "UAV Swarm", "Motion Capture"],
+      tags: ["Crazyflie", "PX4 SITL", "Gazebo", "ROS 2 Jazzy", "MAVROS", "NOKOV", "VRPN", "Python"],
 
       summary: {
         zh: "面向城市楼宇快递「最后一百米」问题，基于 Crazyflie 小型多旋翼无人机搭建自主飞行与多机协同验证平台，实现悬停飞行、路径规划、智能窗交互与单机/多机取件测试，并引入 NOKOV 动作捕捉系统提升定位精度。",
@@ -311,8 +311,11 @@ const SITE_DATA = {
           file: "simulation-test.mp4",
           poster: "simulation-test.jpg",
           duration: "1:56",
-          title: { zh: "仿真环境飞行验证", en: "Simulation flight validation" },
-          desc: { zh: "在 Gazebo 仿真场景中验证路径规划与飞行控制效果", en: "Validating path planning and flight control in a Gazebo simulation scene" },
+          title: { zh: "仿真测试：PX4 SITL + Gazebo", en: "Simulation: PX4 SITL + Gazebo" },
+          desc: {
+            zh: "基于 PX4 SITL + Gazebo + ROS 2 Jazzy/MAVROS 的仿真环境，验证三维航线规划与飞行控制效果",
+            en: "Validating 3D route planning and flight control on a PX4 SITL + Gazebo simulation stack with ROS 2 Jazzy and MAVROS",
+          },
         },
       ],
 
