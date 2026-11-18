@@ -307,6 +307,13 @@ const SITE_DATA = {
           title: { zh: "后期：多机协同测试", en: "Late stage: multi-drone collaboration test" },
           desc: { zh: "多台无人机协同执行取件任务", en: "Multiple drones collaborate on pickup tasks" },
         },
+        {
+          file: "simulation-test.mp4",
+          poster: "simulation-test.jpg",
+          duration: "1:56",
+          title: { zh: "仿真环境飞行验证", en: "Simulation flight validation" },
+          desc: { zh: "在 Gazebo 仿真场景中验证路径规划与飞行控制效果", en: "Validating path planning and flight control in a Gazebo simulation scene" },
+        },
       ],
 
       /* ---- 过程性文档（PDF 在线查看，顺序：设计构想 → 商业计划 → 中期 → 结项）---- */
